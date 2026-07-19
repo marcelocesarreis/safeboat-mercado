@@ -1,0 +1,16 @@
+# PORTE INFERIDO — aproximação, não dado.
+# A fonte da DPC NÃO tem campo de porte, arqueação bruta ou comprimento.
+# As faixas abaixo foram deduzidas do tipo de casco pela SAFEBOAT. Um rótulo como
+# "Lancha" cobre de 5 a 25 metros, então a faixa "Pequena" é a mais imprecisa.
+# Não usar como estatística de porte. Usar como ordem de grandeza.
+porte_inferido;embarcacoes;pct;confianca
+Miúda / não motorizada ou motor de popa;411578;36,1;media
+Pequena — até ~12 m;458719;40,2;baixa
+Média — ~12 a 24 m, tipicamente ate 100 AB;110527;9,7;baixa
+Grande — acima de 100 AB;22829;2,0;baixa
+Indefinido (rotulo "Outros" na fonte);136406;12,0;nenhuma
+TOTAL;1140059;100,0;
+#
+# Recorte mais defensavel do topo da faixa: excluindo Balsa (8.432) e Carga Geral (11.527),
+# que cruzam a linha dos 100 AB, restam 2.870 embarcacoes inequivocamente oceanicas
+# ou offshore — destas, 1.225 sao de apoio maritimo/offshore e 736 de graneis liquidos.

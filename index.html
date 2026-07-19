@@ -153,7 +153,7 @@
     <img class="logo" src="img/logo.png" alt="SAFEBOAT">
     <div class="k">Inteligência de Mercado</div>
     <h1>Panorama do Registro Náutico Brasileiro</h1>
-    <p class="sub">Série histórica completa de embarcações inscritas na Marinha do Brasil, extraída dos arquivos oficiais da Diretoria de Portos e Costas — com quebra por estado, por tipo e por Capitania.</p>
+    <p class="sub">Série histórica completa de embarcações registradas na Marinha do Brasil, extraída dos arquivos oficiais da Diretoria de Portos e Costas — com quebra por estado, por atividade, por tipo de casco e por Capitania.</p>
     <div class="chips">
       <span class="chip">Marinha do Brasil · DPC</span>
       <span class="chip">Fonte primária</span>
@@ -169,7 +169,8 @@
   <section>
     <div class="card">
       <h3>Sumário executivo</h3>
-      <p class="lead">O Brasil tem <b>1.140.059 embarcações inscritas</b> nas Capitanias, Delegacias e Agências da Marinha — número extraído diretamente dos arquivos oficiais da DPC, não de imprensa. A série cobre 2012 a 2025 e permite quebra por estado, por tipo de casco e por Capitania.</p>
+      <p class="lead">O Brasil tem <b>1.140.059 embarcações registradas</b> nas Capitanias, Delegacias e Agências da Marinha — número extraído diretamente dos arquivos oficiais da DPC, não de imprensa. É o <b>cadastro completo</b>, de canoa a plataforma de petróleo, e não apenas esporte e recreio como o portal de dados abertos sugere.</p>
+      <p>Do total, <b>454.236 são inequivocamente de esporte e recreio (39,8%)</b>. Outras 393.728 (34,5%) são botes e canoas, que a fonte não permite separar entre lazer, pesca de subsistência e transporte ribeirinho. Pesca soma 57.524 e transporte de carga 55.797.</p>
       <p>O mercado é <b>muito mais concentrado e muito mais interiorano</b> do que a imagem de "náutica de litoral" sugere. São Paulo sozinho responde por 23,7% do cadastro nacional. A <b>Capitania Fluvial do Tietê-Paraná é a segunda maior do país</b>, com 100.089 embarcações — mais que o Rio de Janeiro inteiro. Somadas, as Capitanias fluviais e de reservatório movem um volume comparável ao do litoral.</p>
       <p>No recorte que interessa à SAFEBOAT — cascos com sistemas embarcados a monitorar — são <b>289.707 embarcações</b>, ou 25,4% do cadastro. Esse subconjunto cresce mais rápido que a média: lanchas subiram 21,5% desde 2019 e multicascos 150%.</p>
       <div class="note good" style="margin-top:18px">
@@ -184,9 +185,9 @@
     <h2>Números-âncora</h2>
     <div class="headline">
       <div class="tile">
-        <div class="t">Embarcações inscritas</div>
+        <div class="t">Embarcações registradas</div>
         <div class="v">1.140.059</div>
-        <div class="d">Estoque acumulado no cadastro nacional da Marinha, em 69 tipos.</div>
+        <div class="d">Cadastro nacional completo, todas as atividades, em 69 tipos de casco.</div>
         <span class="yr ok">Arquivo 2025 · fonte primária</span>
       </div>
       <div class="tile">
@@ -212,7 +213,7 @@
 
   <!-- ============ SÉRIE HISTÓRICA ============ -->
   <section>
-    <h2>Série histórica — embarcações inscritas no Brasil</h2>
+    <h2>Série histórica — embarcações registradas no Brasil</h2>
     <div class="card">
       <figure>
         <svg class="line" viewBox="0 0 740 285" role="img" aria-label="Série histórica de embarcações inscritas no Brasil, de 725.299 em 2012 a 1.140.059 no arquivo de 2025">
@@ -395,6 +396,90 @@
     </div>
   </section>
 
+  <!-- ============ POR ATIVIDADE ============ -->
+  <section>
+    <h2>Classificação por atividade</h2>
+    <div class="card">
+      <div class="note warn">
+        <b class="h">O conjunto não é só esporte e recreio — apesar do que o portal diz</b>
+        O portal de dados abertos descreve o conjunto como "embarcações de Esporte e Recreio". <b>A descrição está errada.</b> A base contém pesqueiro, rebocador, draga, balsa, petroleiro, porta-contentor, FPSO e plataforma de perfuração. É o <b>cadastro completo</b> das Capitanias, Delegacias e Agências — toda embarcação registrada no Brasil, de canoa a plataforma.
+      </div>
+
+      <p style="margin:20px 0 16px">A Marinha não publica campo de atividade — só 69 rótulos de tipo de casco. <b>A classificação abaixo é nossa</b>, construída agrupando esses 69 tipos. Os 69 estão alocados, zero órfãos, e a soma fecha exatamente no total nacional.</p>
+
+      <figure>
+        <div class="chart">
+          <div class="lbl">Esporte e recreio</div><div class="track" data-tip="Esporte e recreio — 454.236 (39,8%)"><div class="bar" style="width:100%"></div><span class="val">454.236</span></div>
+          <div class="lbl">Ambíguo</div><div class="track" data-tip="Bote e canoa — lazer ou subsistência — 393.728 (34,5%)"><div class="bar" style="width:86.7%; background:var(--navy-2)"></div><span class="val">393.728</span></div>
+          <div class="lbl">Não classificado</div><div class="track" data-tip="Rótulo &quot;Outros&quot; na fonte — 136.406 (12,0%)"><div class="bar" style="width:30.0%; background:#9AA0B4"></div><span class="val">136.406</span></div>
+          <div class="lbl">Pesca</div><div class="track" data-tip="Pesca — 57.524 (5,0%)"><div class="bar" style="width:12.7%"></div><span class="val">57.524</span></div>
+          <div class="lbl">Transporte de carga</div><div class="track" data-tip="Transporte de carga — 55.797 (4,9%)"><div class="bar" style="width:12.3%"></div><span class="val">55.797</span></div>
+          <div class="lbl">Passageiros</div><div class="track" data-tip="Transporte de passageiros — 20.891 (1,8%)"><div class="bar" style="width:4.6%"></div><span class="val">20.891</span></div>
+          <div class="lbl">Serviço portuário</div><div class="track" data-tip="Serviço portuário e obras — 19.294 (1,7%)"><div class="bar" style="width:4.2%"></div><span class="val">19.294</span></div>
+          <div class="lbl">Apoio offshore</div><div class="track" data-tip="Apoio marítimo e offshore — 1.107 (0,1%)"><div class="bar" style="width:1%"></div><span class="val">1.107</span></div>
+          <div class="lbl">Granéis líquidos</div><div class="track" data-tip="Granéis líquidos — 736 (0,1%)"><div class="bar" style="width:0.8%"></div><span class="val">736</span></div>
+          <div class="lbl">Petróleo</div><div class="track" data-tip="Exploração de petróleo — 170 (0,01%)"><div class="bar" style="width:0.5%"></div><span class="val">170</span></div>
+          <div class="lbl">Pesquisa</div><div class="track" data-tip="Pesquisa e especiais — 170 (0,01%)"><div class="bar" style="width:0.5%"></div><span class="val">170</span></div>
+        </div>
+        <figcaption>Tons mais claros marcam os baldes de baixa confiança: o <b>ambíguo</b> e o <b>não classificado</b>. Detalhamento dos tipos em cada categoria em <code>dados/embarcacoes-por-atividade.csv</code>.</figcaption>
+      </figure>
+
+      <div class="note stop" style="margin-top:22px">
+        <b class="h">Quase metade do cadastro não tem atividade determinável</b>
+        <ul>
+          <li><b>Bote e canoa somam 393.728 unidades (34,5%)</b> e não dá para saber se são lazer, pesca de subsistência ou transporte ribeirinho. O rótulo do casco não diz o uso. Na Amazônia é transporte; em represa paulista é lazer.</li>
+          <li><b>O rótulo "Outros" tem 136.406 unidades (12,0%)</b> e a fonte não abre o que há dentro.</li>
+          <li>Somados, são <b>46,5% do cadastro sem atividade atribuível</b>. Qualquer afirmação do tipo "X% da frota brasileira é de lazer" precisa declarar como tratou esses dois baldes — ou está chutando.</li>
+        </ul>
+      </div>
+
+      <div class="note info" style="margin-top:14px">
+        <b class="h">Leitura conservadora e leitura otimista</b>
+        Se todo o balde ambíguo for lazer, o esporte e recreio chega a <b>847.964 embarcações (74,4%)</b>. Se nenhum for, fica em <b>454.236 (39,8%)</b>. O número real está entre os dois, e a fonte não permite estreitar. <b>Prefira citar a faixa, não um ponto.</b>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ POR PORTE ============ -->
+  <section>
+    <h2>Porte — o que dá e o que não dá para dizer</h2>
+    <div class="card">
+      <div class="note stop">
+        <b class="h">Porte não existe nesta fonte</b>
+        O arquivo da DPC tem seis colunas: Distrito Naval, Organização Militar, sigla, UF, tipo de casco e quantidade. <b>Não há arqueação bruta, comprimento, ano de fabricação nem potência.</b> Não é possível fazer uma quebra por tamanho a partir daqui — e não vou fabricar uma.
+      </div>
+
+      <p style="margin:20px 0 16px">O que dá para fazer é <b>inferir uma faixa a partir do tipo de casco</b>. É aproximação, não estatística. A faixa "Pequena" é a mais frágil porque o rótulo "Lancha" cobre de 5 a 25 metros.</p>
+
+      <div class="tw">
+        <table>
+          <thead><tr><th>Porte inferido</th><th class="n">Embarcações</th><th class="n">%</th><th>Confiança</th></tr></thead>
+          <tbody>
+            <tr><td>Pequena — até ~12 m</td><td class="n">458.719</td><td class="n">40,2%</td><td><span class="b no">Baixa</span></td></tr>
+            <tr><td>Miúda — não motorizada ou motor de popa</td><td class="n">411.578</td><td class="n">36,1%</td><td><span class="b mid">Média</span></td></tr>
+            <tr><td>Não classificado na fonte</td><td class="n">136.406</td><td class="n">12,0%</td><td><span class="b no">Nenhuma</span></td></tr>
+            <tr><td>Média — ~12 a 24 m</td><td class="n">110.527</td><td class="n">9,7%</td><td><span class="b no">Baixa</span></td></tr>
+            <tr><td>Grande — acima de 100 AB</td><td class="n">22.829</td><td class="n">2,0%</td><td><span class="b no">Baixa</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="note warn" style="margin-top:20px">
+        <b class="h">O balde "Grande" é o menos confiável de todos</b>
+        Dele, <b>19.959 são balsas e carga geral</b> — tipos que cruzam a linha dos 100 AB nos dois sentidos, especialmente em rio. Excluindo os dois, restam <b>2.870 embarcações inequivocamente oceânicas ou offshore</b>: 1.225 de apoio marítimo e offshore, 736 de granéis líquidos, 416 petroleiros, 307 graneleiros e 170 unidades de exploração de petróleo. <b>Esse 2.870 é o número defensável</b>, não os 22.829.
+      </div>
+
+      <div class="note info" style="margin-top:14px">
+        <b class="h">Onde o porte real existe</b>
+        <ul>
+          <li><b>Tribunal Marítimo</b> — registro de propriedade marítima acima de 100 AB, com arqueação. É a fonte certa para a frota grande.</li>
+          <li><b>ANTAQ</b> — frota de navegação interior e cabotagem com tonelagem de porte bruto.</li>
+          <li><b>Pedido via LAI à DPC</b> — o SISGEMB tem os campos de AB e comprimento por embarcação; eles simplesmente não são publicados no dado aberto.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
   <!-- ============ MERCADO ENDEREÇÁVEL ============ -->
   <section>
     <h2>Nosso mercado endereçável</h2>
@@ -430,7 +515,11 @@
           <span class="b ok">Verificado</span>
         </div>
         <p>Inscrição é o ato de cadastrar na Marinha a embarcação com Arqueação Bruta menor ou igual a 100. O documento que comprova é o <b>Título de Inscrição de Embarcação (TIE)</b>, emitido por Capitanias, Delegacias e Agências. Portaria da DPC de 2024 consolidou TIE e TIEM em documento digital único, mantendo o escopo de até 100 AB.</p>
-        <p>Acima de 100 AB entra o <b>registro de propriedade marítima no Tribunal Marítimo</b> (Lei 7.652/1988, alterada pela Lei 9.774/1998). <b>São universos distintos e não devem ser somados.</b> Tudo neste documento é o universo de até 100 AB.</p>
+        <p>Acima de 100 AB entra o <b>registro de propriedade marítima no Tribunal Marítimo</b> (Lei 7.652/1988, alterada pela Lei 9.774/1998) — um ato <i>adicional</i>, de propriedade, que não substitui o cadastro na Capitania.</p>
+        <div class="note stop" style="margin:12px 0 4px">
+          <b class="h">Correção — versão anterior deste documento errou aqui</b>
+          A versão publicada antes afirmava que "tudo neste documento é o universo de até 100 AB". <b>Está errado.</b> A base contém FPSO, plataforma semi-submersível, petroleiro, porta-contentor e sonda — embarcações muito acima de 100 AB. O cadastro das Capitanias registra a frota inteira; o Tribunal Marítimo é uma camada de propriedade sobreposta, não um universo separado.
+        </div>
         <div class="src">Fontes: <a href="https://www.marinha.mil.br/dpc/carta-de-servicos/inscri%C3%A7%C3%A3o-de-embarca%C3%A7%C3%B5es">Carta de Serviços da DPC</a> · <a href="https://www.marinha.mil.br/tm/propriedade-maritima">Tribunal Marítimo</a></div>
       </div>
 

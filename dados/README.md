@@ -58,11 +58,26 @@ Delimitador `;`, codificação UTF-8.
 5. **Goiás aparece do zero em 2020.** GO tem 0 até 2019 e salta para 17.345 em 2025 — criação ou
    reorganização de Organização Militar, não crescimento real de frota.
 
-6. **Escopo.** O conjunto é descrito pelo portal como embarcações de Esporte e Recreio, mas os
-   dados contêm tipos claramente comerciais (rebocador, empurrador, balsa, carga geral, pesqueiro).
-   Na prática o arquivo cobre o cadastro das Capitanias de forma ampla — o que é coerente com o
-   universo de inscrição (Arqueação Bruta ≤ 100). A frota acima de 100 AB fica no registro do
-   Tribunal Marítimo e **não** está aqui.
+6. **Escopo — a descrição do portal está errada.** O conjunto é descrito como embarcações de
+   Esporte e Recreio, mas os dados contêm pesqueiro, rebocador, draga, balsa, petroleiro,
+   porta-contentor, sonda, plataforma semi-submersível e FPSO. É o **cadastro completo** das
+   Capitanias, Delegacias e Agências — toda embarcação registrada no Brasil, de canoa a
+   plataforma de petróleo.
+
+   Correção de uma versão anterior deste arquivo, que afirmava cobrir apenas o universo de
+   Arqueação Bruta ≤ 100: **está errado**. A presença de FPSOs e plataformas prova o contrário.
+   O registro no Tribunal Marítimo, obrigatório acima de 100 AB, é um ato *adicional* de
+   propriedade — não um cadastro paralelo que substitua o da Capitania.
+
+7. **Não há campo de porte.** As seis colunas são Distrito Naval, Organização Militar, sigla, UF,
+   tipo de casco e quantidade. Sem arqueação bruta, comprimento, ano de fabricação ou potência.
+   O arquivo `embarcacoes-por-porte-inferido.csv` traz uma aproximação deduzida do tipo de casco —
+   é inferência da SAFEBOAT, não dado da Marinha, e está rotulada com o nível de confiança.
+
+8. **Atividade também não é campo da fonte.** O arquivo `embarcacoes-por-atividade.csv` agrupa os
+   69 rótulos de tipo em 11 categorias de atividade. O agrupamento é da SAFEBOAT. Botes e canoas
+   (393.728 unidades) ficam num balde explicitamente ambíguo porque o rótulo do casco não
+   distingue lazer de pesca de subsistência ou transporte ribeirinho.
 
 ## Como reproduzir
 

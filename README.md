@@ -12,14 +12,49 @@ Publicado em https://marcelocesarreis.github.io/safeboat-mercado
 | `index.html` | O dossiê. Abra no navegador; o botão "Salvar em PDF" gera a versão para circular. |
 | `dados/embarcacoes-por-uf.csv` | 27 unidades federativas × 13 anos de referência |
 | `dados/embarcacoes-por-tipo.csv` | 24 maiores tipos de casco, anos selecionados |
+| `dados/embarcacoes-por-atividade.csv` | 69 tipos agrupados em 11 categorias de atividade |
+| `dados/embarcacoes-por-porte-inferido.csv` | Faixas de porte deduzidas do tipo — aproximação |
 | `dados/README.md` | Proveniência, ressalvas de leitura e como reproduzir a extração |
 
 ## Número principal
 
-**1.140.059 embarcações inscritas** no arquivo mais recente da DPC — estoque acumulado
-no cadastro das Capitanias, Delegacias e Agências, universo de Arqueação Bruta ≤ 100.
+**1.140.059 embarcações registradas** no arquivo mais recente da DPC — estoque acumulado no
+cadastro das Capitanias, Delegacias e Agências.
+
+É o **cadastro completo**, não apenas esporte e recreio: a base contém pesqueiro, rebocador,
+balsa, petroleiro, porta-contentor e até FPSO e plataforma de perfuração. A descrição do
+conjunto no portal de dados abertos, que fala em "Esporte e Recreio", está errada.
 
 Série de 2012 a 2025. O total de 2019 fecha em 936.375.
+
+## Quebra por atividade
+
+| Atividade | Embarcações | % |
+|---|---:|---:|
+| Esporte e recreio | 454.236 | 39,8% |
+| Ambíguo — bote e canoa | 393.728 | 34,5% |
+| Não classificado na fonte | 136.406 | 12,0% |
+| Pesca | 57.524 | 5,0% |
+| Transporte de carga | 55.797 | 4,9% |
+| Transporte de passageiros | 20.891 | 1,8% |
+| Serviço portuário e obras | 19.294 | 1,7% |
+| Apoio marítimo e offshore | 1.107 | 0,1% |
+| Granéis líquidos | 736 | 0,1% |
+| Exploração de petróleo | 170 | 0,0% |
+| Pesquisa e especiais | 170 | 0,0% |
+
+**A classificação por atividade é da SAFEBOAT, não da Marinha** — a fonte publica apenas
+rótulos de tipo de casco. Os 69 tipos estão alocados, sem órfãos, e a soma fecha no total.
+
+Note que **46,5% do cadastro não tem atividade determinável** (o balde ambíguo mais o
+"Outros"). Ao citar participação de lazer, prefira a faixa 39,8%–74,4% a um ponto único.
+
+## Porte
+
+**Não é possível a partir desta fonte.** O arquivo não tem arqueação bruta, comprimento nem
+ano de fabricação. O CSV de porte inferido é aproximação deduzida do tipo de casco, rotulada
+com nível de confiança. Porte real está no Tribunal Marítimo (acima de 100 AB), na ANTAQ
+(navegação interior e cabotagem) ou via pedido LAI ao SISGEMB.
 
 ## Ler antes de citar qualquer número
 

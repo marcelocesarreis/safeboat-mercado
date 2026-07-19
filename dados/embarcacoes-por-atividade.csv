@@ -1,0 +1,16 @@
+# Classificação por atividade — construída pela SAFEBOAT, não pela Marinha.
+# A fonte publica apenas 69 rótulos de tipo de casco, sem campo de atividade.
+# Base: arquivo mais recente da DPC. Soma fecha em 1.140.059 (69 tipos, zero órfãos).
+atividade;embarcacoes;pct;tipos_incluidos
+Esporte e recreio;454236;39,8;Lancha / Moto-Aquática / Veleiro / Multicasco / Iate / Jet Boat / Caiaque / Laser
+Ambíguo (lazer ou subsistência);393728;34,5;Bote / Canoa
+Não classificado na fonte;136406;12,0;Outros
+Pesca;57524;5,0;Pesqueiro / Jangada / Saveiro / Traineira / Caique / Curral
+Transporte de carga;55797;4,9;Chata / Carga Geral / Balsa / Barcaça / Batelão / Graneleiro / Alvarenga / Porta-Contentor / Multipurpose / Ro-Ro Carga / Carga Pesada / HSC Carga
+Transporte de passageiros;20891;1,8;Passageiro-Carga Geral / Passageiro / Escuna / Ferry Boat / Hovercraft / Transporte Escolar / HSC Passageiro
+Serviço portuário e obras;19294;1,7;Draga / Flutuante / Rebocador / Empurrador / Cábrea / Dique Flutuante / Quebra-gelo
+Apoio marítimo e offshore;1107;0,1;Supridor / AHTS / Apoio a Mergulho / Apoio a ROV / Lançador de Linhas / Manuseio de Linhas / Flotel / Estimulador de Poço
+Granéis líquidos;736;0,1;Petroleiro / Tanque / Petroleiro e Químico / Gases Liquefeitos / Químico / Químico e Gaseiro / Cisterna FSU
+Exploração de petróleo;170;0,0;FPSO / Plataforma Semi-Submersível / Plataforma Fixa / Plataforma Auto-Elevável / Sonda
+Pesquisa e especiais;170;0,0;Pesquisa / Anfíbia / Oceanográfico / Embarcação Autônoma / Hidroavião
+TOTAL;1140059;100,0;69 tipos
