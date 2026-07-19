@@ -3,7 +3,7 @@
 Dossiê de inteligência de mercado sobre embarcações inscritas na Marinha do Brasil,
 construído a partir dos arquivos oficiais da Diretoria de Portos e Costas (DPC).
 
-**Documento de uso interno.** Repositório privado.
+Publicado em https://marcelocesarreis.github.io/safeboat-mercado
 
 ## Conteúdo
 
