@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#2D324B">
+<title>Santa Catarina · Recorte Náutico · SAFEBOAT</title>
+<link rel="icon" type="image/png" href="img/logo-circulo.png">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    color-scheme: light;
+    --navy: #2D324B; --navy-2: #4A5170; --green: #0B6B4D; --blue: #2264BE;
+    --bg: #F0F1F5; --ink: #1A1F2B; --ink-2: #4E5666; --ink-3: #8A8F9C;
+    --line: #DDDFE6; --line-2: #E3E5EB; --warn: #B4530A; --stop: #8A3324;
+  }
+  body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--ink); line-height: 1.55; -webkit-font-smoothing: antialiased; }
+  .hero { background: var(--navy); color: #fff; padding: 40px 20px 92px; }
+  .hero-in { max-width: 980px; margin: 0 auto; }
+  .hero img.logo { height: 46px; display: block; margin-bottom: 26px; }
+  .hero .k { font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,.65); font-weight: 700; }
+  .hero h1 { font-size: 34px; font-weight: 800; margin: 8px 0 8px; line-height: 1.2; }
+  .hero .sub { font-size: 15.5px; color: rgba(255,255,255,.8); max-width: 68ch; }
+  .hero .chips { display: flex; gap: 8px; margin-top: 20px; flex-wrap: wrap; }
+  .hero .chip { background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.2); border-radius: 20px; padding: 4px 13px; font-size: 12.5px; font-weight: 600; }
+  .hero a.back { color: rgba(255,255,255,.7); font-size: 12.5px; font-weight: 600; text-decoration: none; display: inline-block; margin-bottom: 18px; }
+  .hero a.back:hover { color: #fff; }
+
+  main { max-width: 980px; margin: -60px auto 48px; padding: 0 16px; }
+  section { margin-bottom: 30px; }
+  h2 { font-size: 13px; letter-spacing: 2px; text-transform: uppercase; color: var(--ink-2); font-weight: 800; margin-bottom: 14px; display: flex; align-items: center; gap: 10px; }
+  h2:after { content: ""; flex: 1; height: 1px; background: var(--line); }
+  h3 { font-size: 15px; color: var(--navy); font-weight: 800; margin-bottom: 8px; }
+  .card { background: #fff; border-radius: 16px; padding: 24px; box-shadow: 0 2px 10px rgba(26,31,43,.08); }
+  .card + .card { margin-top: 14px; }
+  p { font-size: 14.5px; color: #3A3F4E; }
+  p + p { margin-top: 10px; }
+  .lead { font-size: 15.5px; }
+  a { color: var(--blue); font-weight: 600; text-decoration: none; word-break: break-word; }
+  a:hover { text-decoration: underline; }
+  code { font-family: ui-monospace, Consolas, monospace; font-size: 12.5px; background: #F4F5F8; border-radius: 5px; padding: 1px 5px; color: var(--ink-2); }
+
+  .headline { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; }
+  .tile { background: #fff; border-radius: 16px; padding: 22px; box-shadow: 0 2px 10px rgba(26,31,43,.08); }
+  .tile .t { font-size: 11.5px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--ink-3); font-weight: 800; }
+  .tile .v { font-size: 33px; font-weight: 800; color: var(--navy); margin: 8px 0 4px; line-height: 1.1; font-variant-numeric: tabular-nums; }
+  .tile .v small { font-size: 15px; color: var(--ink-3); font-weight: 700; }
+  .tile .d { font-size: 12.5px; color: var(--ink-2); }
+
+  .tw { overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 0 -4px; padding: 0 4px; }
+  table { border-collapse: collapse; width: 100%; min-width: 520px; font-size: 13.5px; }
+  th { text-align: left; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; color: var(--ink-3); font-weight: 800; padding: 0 12px 9px 0; border-bottom: 1px solid var(--line); }
+  td { padding: 9px 12px 9px 0; border-bottom: 1px solid var(--line-2); color: #3A3F4E; vertical-align: top; }
+  td:first-child, th:first-child { padding-left: 2px; }
+  tr:last-child td { border-bottom: none; }
+  td.n, th.n { text-align: right; }
+  td.n { font-variant-numeric: tabular-nums; font-weight: 700; color: var(--navy); }
+  th.n:last-child, td.n:last-child { padding-right: 2px; }
+  tr.hi td { background: #F7F8FB; }
+  td .sub { display: block; font-size: 11.5px; color: var(--ink-3); font-weight: 600; }
+
+  figure { margin: 0; }
+  figcaption { font-size: 12.5px; color: var(--ink-2); margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--line-2); }
+  svg.line { width: 100%; height: auto; display: block; overflow: visible; }
+  svg.line .gl { stroke: var(--line-2); stroke-width: 1; }
+  svg.line .ax { fill: var(--ink-3); font-size: 11px; font-weight: 600; font-family: inherit; }
+  svg.line .sr { fill: none; stroke: var(--navy); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+  svg.line .dot { fill: var(--navy); stroke: #fff; stroke-width: 2; }
+  svg.line .dlab { fill: var(--navy); font-size: 12px; font-weight: 800; font-family: inherit; font-variant-numeric: tabular-nums; }
+
+  .chart { display: grid; grid-template-columns: auto 1fr; gap: 5px 12px; align-items: center; margin-top: 4px; }
+  .chart .lbl { font-size: 12.5px; color: var(--ink-2); text-align: right; font-weight: 600; white-space: nowrap; }
+  .chart .track { position: relative; height: 22px; display: flex; align-items: center; gap: 8px; }
+  .chart .bar { height: 15px; background: var(--navy); border-radius: 0 4px 4px 0; min-width: 2px; transition: filter .12s; }
+  .chart .track:hover .bar { filter: brightness(1.5); }
+  .chart .val { font-size: 12px; font-variant-numeric: tabular-nums; color: var(--ink-2); font-weight: 700; white-space: nowrap; }
+  .chart .track[data-tip]:hover:after { content: attr(data-tip); position: absolute; left: 0; bottom: 100%; background: var(--navy); color: #fff; font-size: 11.5px; font-weight: 600; border-radius: 7px; padding: 5px 9px; white-space: nowrap; z-index: 5; box-shadow: 0 4px 14px rgba(26,31,43,.3); }
+
+  .note { border-radius: 14px; padding: 18px 20px; font-size: 13.5px; line-height: 1.6; }
+  .note b.h { display: block; font-size: 12px; letter-spacing: 1.2px; text-transform: uppercase; margin-bottom: 7px; }
+  .note.warn { background: #FDF7EF; border: 1px solid #F0DFC6; color: #5C3A12; }
+  .note.warn b.h { color: var(--warn); }
+  .note.stop { background: #FBF1EE; border: 1px solid #EBCFC8; color: #5C2A1E; }
+  .note.stop b.h { color: var(--stop); }
+  .note.info { background: #F1F6FD; border: 1px solid #CFDFF5; color: #1F3A5F; }
+  .note.info b.h { color: var(--blue); }
+  .note.good { background: #EFF8F3; border: 1px solid #C6E5D4; color: #14432F; }
+  .note.good b.h { color: var(--green); }
+  .note ul { margin: 8px 0 0 18px; }
+  .note li { margin-top: 5px; }
+
+  .perfil { display: grid; grid-template-columns: repeat(auto-fit, minmax(215px, 1fr)); gap: 12px; margin-top: 4px; }
+  .pc { border: 1px solid var(--line); border-radius: 14px; padding: 16px; }
+  .pc .nm { font-size: 13.5px; font-weight: 800; color: var(--navy); }
+  .pc .ct { font-size: 11.5px; color: var(--ink-3); font-weight: 700; text-transform: uppercase; letter-spacing: .8px; margin-top: 2px; }
+  .pc .big { font-size: 25px; font-weight: 800; color: var(--navy); margin: 10px 0 2px; font-variant-numeric: tabular-nums; }
+  .pc .tx { font-size: 12.5px; color: var(--ink-2); margin-top: 8px; }
+  .pc.a { border-color: #BFE5CE; background: #F6FBF8; }
+  .pc.b { border-color: #F0DFC6; background: #FDFAF5; }
+
+  ul.plain { list-style: none; }
+  ul.plain li { padding: 6px 0 6px 26px; position: relative; font-size: 14px; color: #3A3F4E; }
+  ul.plain li:before { content: "→"; position: absolute; left: 2px; color: var(--blue); font-weight: 800; }
+
+  footer { background: var(--navy); color: rgba(255,255,255,.7); font-size: 12.5px; padding: 26px 16px; }
+  footer .fin { max-width: 980px; margin: 0 auto; display: flex; gap: 16px; justify-content: space-between; flex-wrap: wrap; }
+  footer b { color: #fff; }
+  footer a { color: rgba(255,255,255,.85); }
+  .print { position: fixed; bottom: 18px; right: 18px; background: var(--navy); color: #fff; border: none; border-radius: 24px; padding: 12px 20px; font-size: 13px; font-weight: 700; cursor: pointer; box-shadow: 0 6px 20px rgba(26,31,43,.35); font-family: inherit; }
+
+  @media (max-width: 700px) { .hero h1 { font-size: 26px; } .hero { padding: 30px 18px 84px; } .card { padding: 20px 18px; } }
+  @media print { body { background:#fff } .print{display:none} .card,.tile{box-shadow:none;border:1px solid var(--line)} section{break-inside:avoid} .hero{padding-bottom:40px} main{margin-top:24px} }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-in">
+    <img class="logo" src="img/logo.png" alt="SAFEBOAT">
+    <a class="back" href="index.html">← Panorama nacional</a>
+    <div class="k">Inteligência de Mercado · Recorte regional</div>
+    <h1>Santa Catarina</h1>
+    <p class="sub">As 91.740 embarcações catarinenses, abertas pelas quatro Capitanias e Delegacias do estado, por tipo de casco e por atividade — com o que isso muda na nossa priorização comercial.</p>
+    <div class="chips">
+      <span class="chip">Marinha do Brasil · DPC</span>
+      <span class="chip">4º maior estado</span>
+      <span class="chip">4 Organizações Militares</span>
+      <span class="chip">Arquivo mais recente</span>
+    </div>
+  </div>
+</div>
+
+<main>
+
+  <section>
+    <div class="card">
+      <h3>Em uma frase</h3>
+      <p class="lead">Santa Catarina é o <b>4º estado em frota registrada</b>, mas o <b>endereçável catarinense é praticamente metade do paranaense</b> — 21.169 contra 40.188 — apesar de a frota total de SC ser 82% da do Paraná. Para o nosso produto, SC rende menos do que seu tamanho sugere.</p>
+      <p>Dentro do estado a diferença é ainda mais nítida: <b>Itajaí e Florianópolis concentram 73% de todo o endereçável de SC</b>, enquanto Laguna, com 15.642 embarcações registradas, oferece apenas 1.334 cascos monitoráveis. São mercados diferentes sob a mesma sigla.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>Números-âncora</h2>
+    <div class="headline">
+      <div class="tile">
+        <div class="t">Frota registrada</div>
+        <div class="v">91.740</div>
+        <div class="d">8,05% do cadastro nacional. 4º maior estado, atrás de SP, RJ e PR.</div>
+      </div>
+      <div class="tile">
+        <div class="t">Recorte endereçável</div>
+        <div class="v">21.169</div>
+        <div class="d">Lancha, veleiro, multicasco e jet boat — 23,1% da frota de SC.</div>
+      </div>
+      <div class="tile">
+        <div class="t">Esporte e recreio</div>
+        <div class="v">40,0 <small>%</small></div>
+        <div class="d">Praticamente idêntico ao nacional (39,8%).</div>
+      </div>
+      <div class="tile">
+        <div class="t">Organizações Militares</div>
+        <div class="v">4</div>
+        <div class="d">Florianópolis, São Francisco do Sul, Itajaí e Laguna.</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>As quatro Capitanias — frota total</h2>
+    <div class="card">
+      <figure>
+        <div class="chart">
+          <div class="lbl">Florianópolis</div><div class="track" data-tip="Capitania dos Portos de Santa Catarina — 27.468 (29,9%)"><div class="bar" style="width:100%"></div><span class="val">27.468</span></div>
+          <div class="lbl">S. Francisco do Sul</div><div class="track" data-tip="Delegacia em São Francisco do Sul — 25.298 (27,6%)"><div class="bar" style="width:92.1%"></div><span class="val">25.298</span></div>
+          <div class="lbl">Itajaí</div><div class="track" data-tip="Delegacia em Itajaí — 23.332 (25,4%)"><div class="bar" style="width:84.9%"></div><span class="val">23.332</span></div>
+          <div class="lbl">Laguna</div><div class="track" data-tip="Delegacia em Laguna — 15.642 (17,1%)"><div class="bar" style="width:56.9%"></div><span class="val">15.642</span></div>
+        </div>
+        <figcaption>Distribuição incomumente equilibrada. Nenhuma das quatro passa de 30% do estado — diferente de São Paulo, onde duas OMs concentram a maior parte da frota.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section>
+    <h2>Endereçável — onde o volume realmente está</h2>
+    <div class="card">
+      <figure>
+        <div class="chart">
+          <div class="lbl">Florianópolis</div><div class="track" data-tip="8.228 endereçáveis — 30,0% da frota local"><div class="bar" style="width:100%"></div><span class="val">8.228 <span style="color:var(--ink-3); font-weight:600">· 30,0% local</span></span></div>
+          <div class="lbl">Itajaí</div><div class="track" data-tip="7.139 endereçáveis — 30,6% da frota local"><div class="bar" style="width:86.8%"></div><span class="val">7.139 <span style="color:var(--ink-3); font-weight:600">· 30,6% local</span></span></div>
+          <div class="lbl">S. Francisco do Sul</div><div class="track" data-tip="4.468 endereçáveis — 17,7% da frota local"><div class="bar" style="width:54.3%; background:var(--navy-2)"></div><span class="val">4.468 <span style="color:var(--ink-3); font-weight:600">· 17,7% local</span></span></div>
+          <div class="lbl">Laguna</div><div class="track" data-tip="1.334 endereçáveis — 8,5% da frota local"><div class="bar" style="width:16.2%; background:#9AA0B4"></div><span class="val">1.334 <span style="color:var(--ink-3); font-weight:600">· 8,5% local</span></span></div>
+        </div>
+        <figcaption>Endereçável = lancha, veleiro, multicasco e jet boat. Recorte da SAFEBOAT, não da Marinha.</figcaption>
+      </figure>
+
+      <div class="note good" style="margin-top:22px">
+        <b class="h">A inversão que importa</b>
+        <b>São Francisco do Sul é a 2ª maior frota de SC, mas só a 3ª em endereçável</b> — e por larga margem: 4.468 contra 7.139 de Itajaí, que tem frota menor. Laguna é 4ª em frota e distante última em endereçável. <b>Ordenar esforço comercial por tamanho de frota levaria a priorizar São Francisco do Sul acima de Itajaí — e seria erro.</b>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Perfil de cada Capitania</h2>
+    <div class="card">
+      <div class="perfil">
+        <div class="pc a">
+          <div class="nm">Itajaí</div>
+          <div class="ct">Perfil mais premium</div>
+          <div class="big">30,6%</div>
+          <div class="tx">Único dos quatro onde <b>lancha é o tipo mais numeroso</b> (6.625, 28,4% da frota local). Moto-aquática vem logo atrás com 5.803. Maior densidade de endereçável do estado.</div>
+        </div>
+        <div class="pc a">
+          <div class="nm">Florianópolis</div>
+          <div class="ct">Maior volume absoluto</div>
+          <div class="big">30,0%</div>
+          <div class="tx">Maior endereçável em números absolutos (8.228) com perfil equilibrado: bote 31,0%, lancha 27,5%, moto-aquática 20,0%. É a Capitania-sede do estado.</div>
+        </div>
+        <div class="pc b">
+          <div class="nm">São Francisco do Sul</div>
+          <div class="ct">Dominado por bote</div>
+          <div class="big">17,7%</div>
+          <div class="tx"><b>Bote responde por quase metade da frota local</b> (12.583, 49,7%). Lancha cai para 16,2%. Frota grande, mas de baixa densidade para o nosso produto.</div>
+        </div>
+        <div class="pc b">
+          <div class="nm">Laguna</div>
+          <div class="ct">Baixa densidade e dado opaco</div>
+          <div class="big">8,5%</div>
+          <div class="tx"><b>O tipo mais numeroso é "Outros"</b>, com 6.709 unidades — 42,9% da frota local. Lancha é apenas 8,2%. Perfil de pesca e subsistência.</div>
+        </div>
+      </div>
+
+      <div class="note warn" style="margin-top:20px">
+        <b class="h">Laguna é o ponto cego do dado catarinense</b>
+        Quase 43% da frota registrada em Laguna está sob o rótulo <b>"Outros"</b>, que a fonte não abre. Sozinha, Laguna concentra <b>42% de todo o "Outros" de Santa Catarina</b>. Isso puxa o estado inteiro para cima nesse balde: SC tem 17,4% de não classificados contra 12,0% nacional — índice 1,46. <b>Qualquer conclusão sobre Laguna é frágil por construção.</b>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Santa Catarina contra os outros grandes</h2>
+    <div class="card">
+      <div class="tw">
+        <table>
+          <thead><tr><th>Estado</th><th class="n">Frota</th><th class="n">Endereçável</th><th class="n">Densidade</th></tr></thead>
+          <tbody>
+            <tr><td>São Paulo</td><td class="n">269.744</td><td class="n">57.204</td><td class="n">21,2%</td></tr>
+            <tr class="hi"><td>Rio de Janeiro</td><td class="n">118.098</td><td class="n">43.013</td><td class="n">36,4%</td></tr>
+            <tr class="hi"><td>Paraná</td><td class="n">111.357</td><td class="n">40.188</td><td class="n">36,1%</td></tr>
+            <tr><td><b>Santa Catarina</b></td><td class="n">91.740</td><td class="n">21.169</td><td class="n">23,1%</td></tr>
+            <tr><td>Rio Grande do Sul</td><td class="n">69.867</td><td class="n">14.824</td><td class="n">21,2%</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="note info" style="margin-top:20px">
+        <b class="h">SC rende menos que seu tamanho</b>
+        <ul>
+          <li>A frota de SC é <b>82% da paranaense</b>, mas o endereçável é <b>53%</b> — o Paraná converte muito melhor frota em cliente potencial.</li>
+          <li><b>RJ e PR têm densidade de 36%</b>, contra 23,1% de SC. SC está mais perto do perfil de SP e RS, que são estados de frota volumosa e pulverizada.</li>
+          <li>Em lanchas especificamente, SC tem <b>índice 0,91 vs. nacional</b> — está sub-representada justamente no tipo que sustenta nosso negócio.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Composição por tipo — o que SC tem a mais e a menos</h2>
+    <div class="card">
+      <div class="tw">
+        <table>
+          <thead><tr><th>Tipo</th><th class="n">SC</th><th class="n">% de SC</th><th class="n">Índice vs. Brasil</th></tr></thead>
+          <tbody>
+            <tr class="hi"><td>Caique<span class="sub">SC concentra 36,7% de todos do país</span></td><td class="n">298</td><td class="n">0,3%</td><td class="n">4,56</td></tr>
+            <tr><td>Caiaque</td><td class="n">374</td><td class="n">0,4%</td><td class="n">1,69</td></tr>
+            <tr class="hi"><td>Outros<span class="sub">Concentrado em Laguna</span></td><td class="n">16.001</td><td class="n">17,4%</td><td class="n">1,46</td></tr>
+            <tr><td>Pesqueiro</td><td class="n">3.329</td><td class="n">3,6%</td><td class="n">1,31</td></tr>
+            <tr><td>Moto-aquática</td><td class="n">15.119</td><td class="n">16,5%</td><td class="n">1,17</td></tr>
+            <tr><td>Bote</td><td class="n">30.529</td><td class="n">33,3%</td><td class="n">1,13</td></tr>
+            <tr><td>Veleiro</td><td class="n">1.435</td><td class="n">1,6%</td><td class="n">0,99</td></tr>
+            <tr class="hi"><td>Lancha</td><td class="n">19.535</td><td class="n">21,3%</td><td class="n">0,91</td></tr>
+            <tr><td>Canoa</td><td class="n">2.824</td><td class="n">3,1%</td><td class="n">0,60</td></tr>
+            <tr class="hi"><td>Multicasco<span class="sub">O segmento que mais cresce no país</span></td><td class="n">99</td><td class="n">0,1%</td><td class="n">0,34</td></tr>
+            <tr><td>Chata</td><td class="n">386</td><td class="n">0,4%</td><td class="n">0,17</td></tr>
+            <tr><td>Passageiro</td><td class="n">81</td><td class="n">0,1%</td><td class="n">0,13</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p style="margin-top:16px">Índice acima de 1 significa que SC tem mais daquele tipo do que sua participação nacional sugeriria. <b>Multicasco em 0,34 é o dado mais desconfortável</b>: é o tipo que mais cresce no Brasil (+150% desde 2019) e SC tem apenas 99 unidades — um terço do que seu tamanho indicaria.</p>
+      <div class="note info" style="margin-top:16px">
+        <b class="h">SC é um estado de lazer, não de comércio</b>
+        Transporte de carga tem índice <b>0,20</b> e transporte de passageiros <b>0,11</b>. Praticamente não há frota comercial registrada em SC. Os 91.740 são, na essência, embarcações de recreio e pesca — o que torna o número catarinense mais "puro" para leitura de mercado náutico do que o total nacional.
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Série histórica de Santa Catarina</h2>
+    <div class="card">
+      <figure>
+        <svg class="line" viewBox="0 0 740 285" role="img" aria-label="Frota de Santa Catarina de 59.392 em 2012 a 91.740 no arquivo mais recente">
+          <line class="gl" x1="56" y1="250" x2="716" y2="250"></line>
+          <line class="gl" x1="56" y1="192.5" x2="716" y2="192.5"></line>
+          <line class="gl" x1="56" y1="135" x2="716" y2="135"></line>
+          <line class="gl" x1="56" y1="77.5" x2="716" y2="77.5"></line>
+          <line class="gl" x1="56" y1="20" x2="716" y2="20"></line>
+          <text class="ax" x="48" y="254" text-anchor="end">0</text>
+          <text class="ax" x="48" y="196.5" text-anchor="end">25 mil</text>
+          <text class="ax" x="48" y="139" text-anchor="end">50 mil</text>
+          <text class="ax" x="48" y="81.5" text-anchor="end">75 mil</text>
+          <text class="ax" x="48" y="24" text-anchor="end">100 mil</text>
+          <polyline class="sr" points="56,113.40 106.8,106.19 157.5,98.36 208.3,92.20 259.1,86.86 309.8,81.20 360.6,75.86 411.4,69.64 462.2,62.97 512.9,61.28 563.7,62.36 614.5,63.61"></polyline>
+          <polyline class="sr" style="stroke-dasharray:5 5; stroke:var(--navy-2)" points="614.5,63.61 716,39.00"></polyline>
+          <circle class="dot" cx="56" cy="113.40" r="4"></circle>
+          <circle class="dot" cx="512.9" cy="61.28" r="4"></circle>
+          <circle class="dot" cx="614.5" cy="63.61" r="4"></circle>
+          <circle class="dot" cx="716" cy="39.00" r="4"></circle>
+          <text class="dlab" x="56" y="104" text-anchor="start">59.392</text>
+          <text class="dlab" x="600" y="80" text-anchor="middle">81.040</text>
+          <text class="dlab" x="716" y="30" text-anchor="end">91.740</text>
+          <text class="ax" x="56" y="270" text-anchor="middle">2012</text>
+          <text class="ax" x="259.1" y="270" text-anchor="middle">2016</text>
+          <text class="ax" x="411.4" y="270" text-anchor="middle">2019</text>
+          <text class="ax" x="614.5" y="270" text-anchor="middle">2023</text>
+          <text class="ax" x="716" y="270" text-anchor="middle">2025</text>
+          <text class="ax" x="665.2" y="284" text-anchor="middle" style="fill:var(--warn); font-size:10px">sem 2024</text>
+        </svg>
+        <figcaption>Trecho tracejado marca a ausência do arquivo de 2024 na fonte. O trecho 2021–2023, quando SC aparece <i>caindo</i>, coincide com o congelamento da base nacional — não leia como retração real.</figcaption>
+      </figure>
+
+      <div class="note warn" style="margin-top:20px">
+        <b class="h">A participação de SC vem encolhendo</b>
+        SC cresceu <b>mais rápido que o Brasil até 2019</b> — 4,05% ao ano contra 3,72% nacional — e chegou a 8,37% do cadastro. Depois inverteu: de 2019 para cá, SC fez <b>+17,0% contra +21,8% do país</b>, e a participação caiu para <b>8,05%</b>. No mesmo período o Paraná abriu a diferença de 7.577 embarcações (2012) para <b>19.617</b>.
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>O que fazer com isso</h2>
+    <div class="card">
+      <ul class="plain">
+        <li><b>Priorizar Itajaí e Florianópolis.</b> Juntas somam 15.367 dos 21.169 endereçáveis de SC — 73% do potencial em duas praças.</li>
+        <li><b>Não dimensionar São Francisco do Sul pela frota.</b> É a 2ª maior de SC e a 3ª em potencial real. Frota grande, densidade baixa.</li>
+        <li><b>Tratar Laguna como não avaliada</b>, não como fraca. Com 43% da frota local sob rótulo "Outros", falta informação — pode haver mais ou menos potencial do que os 1.334 sugerem.</li>
+        <li><b>Investigar o déficit de multicasco.</b> SC tem 99 unidades contra os ~290 que seu tamanho sugeriria, no segmento que mais cresce no país. Ou há uma lacuna de mercado, ou os multicascos catarinenses se registram em outro estado.</li>
+        <li><b>Rever a comparação com o Paraná.</b> SC tem sido tratada como praça náutica mais forte; no cadastro da Marinha, o Paraná tem quase o dobro do endereçável.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <h2>Ressalvas</h2>
+    <div class="card">
+      <div class="note stop">
+        <b class="h">Antes de usar qualquer número desta página</b>
+        <ul>
+          <li><b>É estoque acumulado, não frota ativa.</b> Inclui embarcações baixadas, sucateadas e abandonadas. Todo número aqui é teto.</li>
+          <li><b>A data do arquivo é incerta.</b> Rotulado 2025 no portal, mas nada mudou lá desde 17/09/2024. Provavelmente reflete meados de 2024.</li>
+          <li><b>O endereçável é recorte nosso</b>, definido por tipo de casco. A Marinha não classifica por atividade nem publica porte.</li>
+          <li><b>Registro segue a Capitania, não o uso.</b> Uma embarcação registrada em Itajaí pode navegar em Florianópolis. A quebra geográfica é de cadastro, não de fundeio.</li>
+        </ul>
+      </div>
+      <p style="margin-top:18px">Dados completos em <code>dados/santa-catarina.csv</code> — por Organização Militar, por tipo de casco com índice, e série histórica. Metodologia e proveniência no <a href="index.html">panorama nacional</a>.</p>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="fin">
+    <div><b>SAFEBOAT</b> · Inteligência de Mercado · <a href="index.html">Panorama nacional</a></div>
+    <div>Fonte: Marinha do Brasil / DPC · Licença ODbL</div>
+  </div>
+</footer>
+
+<button class="print" onclick="window.print()">Salvar em PDF</button>
+
+</body>
+</html>

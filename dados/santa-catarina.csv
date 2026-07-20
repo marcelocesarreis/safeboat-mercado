@@ -1,0 +1,79 @@
+# Santa Catarina - recorte do cadastro da Marinha/DPC, arquivo mais recente
+# Fonte: Marinha do Brasil / DPC, conjunto Embarcacoes (dados.gov.br), licenca ODbL
+# Total SC: 91740 (8,05 pct do cadastro nacional). 4 Organizacoes Militares, 141 combinacoes OM x tipo.
+
+## BLOCO 1 - POR ORGANIZACAO MILITAR
+organizacao_militar;total;pct_SC;enderecavel;pct_enderecavel_local;lancha;moto_aquatica;outros
+Capitania dos Portos de Santa Catarina;27468;29.9;8228;30.0;7542;5505;2073
+Delegacia da Capitania dos Portos em São Francisco do Sul;25298;27.6;4468;17.7;4092;2208;5261
+Delegacia da Capitania dos Portos em Itajaí;23332;25.4;7139;30.6;6625;5803;1958
+Delegacia da Capitania dos Portos em Laguna ;15642;17.1;1334;8.5;1276;1603;6709
+TOTAL SC;91740;100,0;21169;23.1;19535;15119;16001
+
+## BLOCO 2 - POR TIPO DE CASCO
+tipo;SC;pct_SC;pct_do_total_nacional_do_tipo;indice_vs_nacional
+Bote;30529;33.28;9.11;1.13
+Lancha;19535;21.29;7.32;0.91
+Outros;16001;17.44;11.73;1.46
+Moto-Aquática/similar;15119;16.48;9.39;1.17
+Pesqueiro;3329;3.63;10.54;1.31
+Canoa;2824;3.08;4.80;0.60
+Veleiro;1435;1.56;8.00;0.99
+Chata;386;0.42;1.33;0.17
+Balsa;384;0.42;4.55;0.57
+Caiaque;374;0.41;13.63;1.69
+Draga;344;0.37;4.85;0.60
+Caique;298;0.32;36.70;4.56
+Traineira;193;0.21;6.63;0.82
+Flutuante;133;0.14;2.28;0.28
+Rebocador;102;0.11;2.50;0.31
+Jet Boat;100;0.11;7.59;0.94
+Multicasco (Catamarã, Trimarã, Tetramarã, etc);99;0.11;2.74;0.34
+Escuna;89;0.10;7.41;0.92
+Passageiro;81;0.09;1.05;0.13
+Supridor (Supply);67;0.07;11.71;1.46
+Batelão;61;0.07;3.92;0.49
+Barcaça;60;0.07;1.27;0.16
+Iate;53;0.06;7.42;0.92
+Empurrador;17;0.02;0.82;0.10
+Apoio a Mergulho;17;0.02;10.30;1.28
+Jangada;15;0.02;0.10;0.01
+Carga Geral;13;0.01;0.11;0.01
+Saveiro;11;0.01;0.15;0.02
+Hovercraft;10;0.01;9.62;1.19
+Lançador de Linhas;10;0.01;8.33;1.04
+Cábrea;7;0.01;5.30;0.66
+Roll-on / Roll-off Passageiro (Ferry Boat);6;0.01;2.41;0.30
+Oceonagráfico;5;0.01;41.67;5.18
+Pesquisa;5;0.01;3.94;0.49
+Multipurpose;4;0.00;10.81;1.34
+Alvarenga;3;0.00;5.45;0.68
+Manuseio de Âncora (AHTS);3;0.00;1.99;0.25
+Apoio à Manobra;3;0.00;5.77;0.72
+Laser;2;0.00;2.50;0.31
+Tanque (transporte de granéis líquidos);2;0.00;0.98;0.12
+Dique Flutuante;2;0.00;2.27;0.28
+Porta-Contentor;2;0.00;3.77;0.47
+Anfíbia;1;0.00;6.25;0.78
+Cisterna (FSU);1;0.00;25.00;3.11
+Embarcação Autônoma;1;0.00;12.50;1.55
+Passageiro / Carga Geral;1;0.00;0.01;0.00
+Plataforma Fixa;1;0.00;3.23;0.40
+Quebra-gelo;1;0.00;33.33;4.14
+Transporte de Carga Pesada (Navio de Cargas Especiais);1;0.00;7.69;0.96
+
+## BLOCO 3 - SERIE HISTORICA SC
+ano;SC;pct_do_Brasil
+2012;59392;8.19
+2013;62528;8.19
+2014;65930;8.24
+2015;68608;8.25
+2016;70932;8.26
+2017;73392;8.30
+2018;75714;8.32
+2019;78417;8.37
+2020;81318;8.37
+2021;82051;8.28
+2022;81583;8.23
+2023;81040;8.18
+2025;91740;8.05

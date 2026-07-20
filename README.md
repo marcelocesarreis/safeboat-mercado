@@ -9,7 +9,10 @@ Publicado em https://marcelocesarreis.github.io/safeboat-mercado
 
 | Caminho | O que é |
 |---|---|
-| `index.html` | O dossiê. Abra no navegador; o botão "Salvar em PDF" gera a versão para circular. |
+| `index.html` | O dossiê nacional. Abra no navegador; o botão "Salvar em PDF" gera a versão para circular. |
+| `sc.html` | Recorte de Santa Catarina — por Capitania, por tipo e por atividade |
+| `dados/santa-catarina.csv` | Dados do recorte catarinense |
+| `dados/brutos/` | Arquivo CSV original da DPC, sem alteração |
 | `dados/embarcacoes-por-uf.csv` | 27 unidades federativas × 13 anos de referência |
 | `dados/embarcacoes-por-tipo.csv` | 24 maiores tipos de casco, anos selecionados |
 | `dados/embarcacoes-por-atividade.csv` | 69 tipos agrupados em 11 categorias de atividade |

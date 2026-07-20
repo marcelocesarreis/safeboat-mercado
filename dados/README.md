@@ -13,6 +13,8 @@ conjunto "Marinha do Brasil — Embarcações" do portal de dados abertos federa
 |---|---|
 | `embarcacoes-por-uf.csv` | Estoque acumulado de embarcações inscritas, por UF, por ano de referência |
 | `embarcacoes-por-tipo.csv` | Estoque acumulado por tipo de embarcação (24 maiores de 69), anos selecionados |
+| `santa-catarina.csv` | Recorte de SC: por Organização Militar, por tipo com índice, série histórica |
+| `brutos/qtd_embarcaoes_om_ano_por_tipo.csv` | **Arquivo original da DPC**, sem alteração — arquivo mais recente do portal |
 
 Delimitador `;`, codificação UTF-8.
 
