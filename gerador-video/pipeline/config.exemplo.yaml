@@ -1,0 +1,20 @@
+# Copie para config.yaml e ajuste.
+
+# Pasta produzida por preparar_dataset.py
+dataset: ../dataset
+
+# Onde salvar os vídeos gerados
+saida_dir: ../saida
+
+voz:
+  # "xtts"       → local e gratuito (Coqui XTTS-v2, clona a partir dos wavs de referência)
+  # "elevenlabs" → API paga, qualidade superior (crie a voz no painel com os mesmos wavs)
+  backend: xtts
+  # elevenlabs_voice_id: SEU_VOICE_ID   # necessário se backend: elevenlabs
+
+video:
+  # "wav2lip"   → sincroniza lábios sobre um vídeo REAL seu (referencia/rosto.mp4) — mais natural
+  # "sadtalker" → anima uma FOTO sua (referencia/rosto.png) — setup mais simples
+  backend: wav2lip
+  wav2lip_dir: ~/repos/Wav2Lip
+  sadtalker_dir: ~/repos/SadTalker

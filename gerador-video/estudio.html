@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Estúdio de Gravação · Gerador de Vídeo</title>
+<style>
+  :root {
+    --bg: #0d1117; --panel: #161b22; --border: #30363d; --text: #e6edf3;
+    --muted: #8b949e; --accent: #2f81f7; --ok: #3fb950; --rec: #f85149; --warn: #d29922;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font: 15px/1.5 system-ui, -apple-system, sans-serif; }
+  .layout { display: grid; grid-template-columns: 300px 1fr; min-height: 100vh; }
+  aside { background: var(--panel); border-right: 1px solid var(--border); padding: 20px; overflow-y: auto; }
+  main { padding: 28px; max-width: 900px; }
+  h1 { font-size: 18px; margin-bottom: 4px; }
+  .sub { color: var(--muted); font-size: 13px; margin-bottom: 20px; }
+  h2 { font-size: 15px; margin: 16px 0 8px; }
+  .bloco-item { padding: 8px 10px; border-radius: 6px; cursor: pointer; font-size: 13px;
+    display: flex; justify-content: space-between; gap: 8px; }
+  .bloco-item:hover { background: #21262d; }
+  .bloco-item.ativo { background: #1f3a5f; }
+  .bloco-item .prog { color: var(--muted); }
+  .bloco-item .prog.completo { color: var(--ok); }
+  .cobertura { margin-top: 20px; padding: 12px; border: 1px solid var(--border); border-radius: 8px; }
+  .cobertura .barra { height: 8px; background: #21262d; border-radius: 4px; overflow: hidden; margin: 8px 0; }
+  .cobertura .barra > div { height: 100%; background: var(--ok); transition: width .3s; }
+  .cobertura .faltam { font-size: 12px; color: var(--warn); word-wrap: break-word; }
+  .card { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 24px; margin-bottom: 20px; }
+  .instrucao { color: var(--muted); font-size: 14px; margin-bottom: 16px; }
+  .texto-frase { font-size: 26px; line-height: 1.4; margin: 18px 0; font-weight: 500; }
+  video { width: 100%; max-width: 640px; border-radius: 8px; background: #000; display: block; }
+  #preview { transform: scaleX(-1); }
+  .controles { display: flex; gap: 10px; margin: 16px 0; flex-wrap: wrap; align-items: center; }
+  button { background: #21262d; color: var(--text); border: 1px solid var(--border); border-radius: 6px;
+    padding: 9px 18px; font-size: 14px; cursor: pointer; }
+  button:hover:not(:disabled) { border-color: var(--muted); }
+  button:disabled { opacity: .4; cursor: not-allowed; }
+  button.primario { background: var(--accent); border-color: var(--accent); }
+  button.gravar { background: var(--rec); border-color: var(--rec); font-weight: 600; }
+  button.aceitar { background: var(--ok); border-color: var(--ok); font-weight: 600; }
+  .status { font-size: 14px; color: var(--muted); }
+  .status.gravando { color: var(--rec); font-weight: 600; }
+  .badge { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 12px;
+    background: #21262d; color: var(--muted); margin-left: 8px; }
+  .badge.aceito { background: #1a3a24; color: var(--ok); }
+  .nav { display: flex; justify-content: space-between; margin-top: 8px; }
+  .aviso { background: #2d1e12; border: 1px solid var(--warn); border-radius: 8px; padding: 14px;
+    margin-bottom: 20px; font-size: 14px; }
+  #erro-fatal { background: #3a1d1d; border: 1px solid var(--rec); border-radius: 8px; padding: 16px; margin-bottom: 20px; display: none; }
+  code { background: #21262d; padding: 2px 6px; border-radius: 4px; font-size: 13px; }
+  .dicas { font-size: 13px; color: var(--muted); }
+  .dicas li { margin: 4px 0 4px 18px; }
+  @media (max-width: 800px) {
+    .layout { grid-template-columns: 1fr; }
+    aside { border-right: none; border-bottom: 1px solid var(--border); }
+    main { padding: 16px; }
+    .card { padding: 16px; }
+    .texto-frase { font-size: 21px; }
+    button { padding: 12px 16px; }  /* alvo de toque maior */
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+  <aside>
+    <h1>🎬 Estúdio de Gravação</h1>
+    <div class="sub">Base de dados para o seu avatar de vídeo</div>
+    <div id="lista-blocos"></div>
+    <div class="cobertura">
+      <strong style="font-size:13px">Cobertura fonética</strong>
+      <div class="barra"><div id="barra-cobertura" style="width:0%"></div></div>
+      <div id="pct-cobertura" style="font-size:13px">0%</div>
+      <div class="faltam" id="fonemas-faltando"></div>
+    </div>
+    <div style="margin-top:20px; display:flex; flex-direction:column; gap:8px">
+      <button id="btn-exportar" class="primario">⬇ Exportar dataset (.zip)</button>
+      <button id="btn-limpar">🗑 Apagar todas as gravações</button>
+    </div>
+  </aside>
+
+  <main>
+    <div id="erro-fatal"></div>
+    <div class="aviso" id="aviso-setup">
+      <strong>Antes de começar:</strong>
+      <ul class="dicas">
+        <li>Ambiente <strong>silencioso</strong>, sem eco (evite salas vazias grandes).</li>
+        <li><strong>Luz frontal</strong> uniforme no rosto; fundo simples e fixo.</li>
+        <li>Enquadre <strong>rosto e ombros</strong>, olhos no terço superior da tela. Use sempre o mesmo enquadramento.</li>
+        <li>Se possível, use um microfone externo a ~20 cm da boca.</li>
+        <li>Grave tudo <strong>na mesma sessão</strong> (mesma roupa, luz e posição) — consistência importa mais que perfeição.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <video id="preview" autoplay muted playsinline></video>
+      <div class="controles">
+        <button id="btn-camera" class="primario">Ligar câmera e microfone</button>
+        <button id="btn-virar" style="display:none">🔄 Trocar câmera</button>
+        <span class="status" id="status-media">câmera desligada</span>
+      </div>
+    </div>
+
+    <div class="card" id="card-item" style="display:none">
+      <div id="titulo-bloco" style="font-weight:600"></div>
+      <div class="instrucao" id="instrucao-bloco"></div>
+      <div class="texto-frase" id="texto-item"></div>
+      <div class="controles">
+        <button id="btn-gravar" class="gravar" disabled>● Gravar</button>
+        <button id="btn-parar" disabled>■ Parar</button>
+        <span class="status" id="status-rec"></span>
+        <span class="badge" id="badge-estado">não gravado</span>
+      </div>
+      <video id="playback" controls playsinline style="display:none"></video>
+      <div class="controles" id="controles-revisao" style="display:none">
+        <button id="btn-aceitar" class="aceitar">✓ Aceitar e avançar</button>
+        <button id="btn-regravar">↺ Regravar</button>
+      </div>
+      <div class="nav">
+        <button id="btn-ant">← Anterior</button>
+        <span class="status" id="posicao"></span>
+        <button id="btn-prox">Próxima →</button>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script type="application/json" id="corpus-embutido">
+{"versao": "1.0", "idioma": "pt-BR", "descricao": "Corpus de gravação foneticamente balanceado para clonagem de voz e avatar. Cada item lista os fonemas-alvo que ele cobre; a união dos itens aceitos determina a cobertura total.", "fonemas_alvo": ["a", "ɛ", "e", "i", "ɔ", "o", "u", "ã", "ẽ", "ĩ", "õ", "ũ", "ão", "ãe", "õe", "ai", "ei", "oi", "ui", "au", "eu", "ou", "ia", "ua", "p", "b", "t", "d", "k", "g", "f", "v", "s", "z", "ʃ", "ʒ", "m", "n", "ɲ", "l", "ʎ", "ʁ", "ɾ", "tʃ", "dʒ", "kw", "gw", "pr", "br", "tr", "dr", "kr", "gr", "fr", "vr", "pl", "bl", "kl", "gl", "fl"], "blocos": [{"id": "vogais", "titulo": "Bloco 1 — Vogais e ritmo básico", "instrucao": "Fale em tom natural de conversa, olhando para a câmera. Pausa de 1 segundo antes e depois de cada frase.", "tipo": "audio_video", "itens": [{"id": "v01", "texto": "A casa amarela fica na beira da praia.", "fonemas": ["a", "k", "z", "m", "ɾ", "l", "f", "b", "p"]}, {"id": "v02", "texto": "O pé dele é maior que o meu pé esquerdo.", "fonemas": ["ɛ", "e", "d", "k", "eu", "ei"]}, {"id": "v03", "texto": "Ela vive feliz ali no interior do país.", "fonemas": ["i", "v", "f", "l", "s", "ɾ"]}, {"id": "v04", "texto": "A vovó tomou um bom caldo de ovo à moda antiga.", "fonemas": ["ɔ", "o", "v", "m", "d", "g", "ou"]}, {"id": "v05", "texto": "O urubu subiu no muro duro do museu.", "fonemas": ["u", "b", "s", "m", "ɾ", "d", "eu"]}, {"id": "v06", "texto": "Todo dia de tarde eu tomo um café puro e quente.", "fonemas": ["t", "d", "k", "f", "p", "e", "ẽ"]}, {"id": "v07", "texto": "A ideia era boa, mas a hora já havia passado.", "fonemas": ["ia", "ɛ", "ɔ", "ʒ", "v", "s", "ai"]}, {"id": "v08", "texto": "Ele leu o edital inteiro antes de assinar o papel.", "fonemas": ["eu", "e", "d", "t", "ei", "ɾ", "s", "p", "l"]}]}, {"id": "nasais", "titulo": "Bloco 2 — Vogais nasais e ditongos nasais", "instrucao": "Capriche na nasalização: ão, ãe, õe, em, im, om, um. Fale com clareza, sem exagerar.", "tipo": "audio_video", "itens": [{"id": "n01", "texto": "O irmão do capitão comprou um caminhão de mamão.", "fonemas": ["ão", "ĩ", "k", "p", "ɲ", "m"]}, {"id": "n02", "texto": "A mãe e o cão saíram de manhã para o campo.", "fonemas": ["ãe", "ão", "ã", "ɲ", "k", "s"]}, {"id": "n03", "texto": "Ele põe as ações e as opiniões no papel sem medo.", "fonemas": ["õe", "ã", "s", "p", "ɲ", "ẽ", "m"]}, {"id": "n04", "texto": "Sim, o marfim do jardim tem um brilho fino e limpo.", "fonemas": ["ĩ", "ʒ", "ɾ", "br", "ʎ", "f", "l", "ũ", "ẽ"]}, {"id": "n05", "texto": "Um atum bom nada fundo no mar profundo.", "fonemas": ["ũ", "õ", "t", "f", "d", "m", "pr"]}, {"id": "n06", "texto": "Quem planta vento colhe tempestade, dizem os antigos.", "fonemas": ["ẽ", "ã", "pl", "v", "ʎ", "t", "z", "ĩ"]}, {"id": "n07", "texto": "Amanhã de manhã o banho vai estar quente.", "fonemas": ["ã", "ɲ", "b", "v", "k", "ẽ"]}]}, {"id": "consoantes", "titulo": "Bloco 3 — Consoantes características do português", "instrucao": "Foco em lh, nh, rr, ch, j, x, z e no s chiado. Articule bem, sem pressa.", "tipo": "audio_video", "itens": [{"id": "c01", "texto": "O filho velho olhou a folha molhada com orgulho.", "fonemas": ["ʎ", "v", "o", "f", "m", "gr", "u"]}, {"id": "c02", "texto": "A aranha estranha ganhou um ninho novo na montanha.", "fonemas": ["ɲ", "tr", "g", "n", "v", "m"]}, {"id": "c03", "texto": "O carro corre rápido pela serra de terra vermelha.", "fonemas": ["ʁ", "ɾ", "k", "p", "s", "t", "v", "ʎ"]}, {"id": "c04", "texto": "O chefe achou o chapéu xadrez embaixo do caixote.", "fonemas": ["ʃ", "f", "p", "ɛ", "dr", "z", "k", "ai"]}, {"id": "c05", "texto": "O jovem general girou a chave da jaula da girafa.", "fonemas": ["ʒ", "n", "ɾ", "ʃ", "v", "l", "f"]}, {"id": "c06", "texto": "A casa azul da vizinha exala um cheiro de rosas.", "fonemas": ["z", "v", "ʒ", "ʃ", "ei", "ʁ", "ɔ"]}, {"id": "c07", "texto": "O tio Diogo sentiu o dia inteiro um gosto de gengibre.", "fonemas": ["tʃ", "dʒ", "s", "g", "ʒ", "ĩ", "ei"]}, {"id": "c08", "texto": "Quase quarenta aquarelas aguardavam o desenho do guaxinim.", "fonemas": ["kw", "gw", "ɾ", "z", "d", "ʃ", "ĩ"]}, {"id": "c09", "texto": "O sapo assado passou o sábado sossegado na sombra.", "fonemas": ["s", "p", "d", "b", "õ", "a"]}, {"id": "c10", "texto": "Faz exame exato do exemplo e explica o exercício.", "fonemas": ["z", "s", "ʃ", "e", "pl", "f"]}]}, {"id": "encontros", "titulo": "Bloco 4 — Encontros consonantais", "instrucao": "Grupos com R e L: pr, br, tr, dr, cr, gr, fr, pl, bl, cl, gl, fl. Pronuncie sem quebrar as sílabas.", "tipo": "audio_video", "itens": [{"id": "e01", "texto": "O prato de prata da prima brilha na prateleira branca.", "fonemas": ["pr", "br", "ʎ", "t", "ei"]}, {"id": "e02", "texto": "O trem atravessou três pontes de madeira podre.", "fonemas": ["tr", "dr", "v", "s", "õ", "ei"]}, {"id": "e03", "texto": "A criança cresceu comendo cravo, creme e grão de trigo.", "fonemas": ["kr", "gr", "tr", "s", "ã", "ão"]}, {"id": "e04", "texto": "O livro fraco de frases frias virou obra de fibra.", "fonemas": ["fr", "vr", "br", "l", "i", "ɔ"]}, {"id": "e05", "texto": "A placa em branco explica o bloco do clube da flauta.", "fonemas": ["pl", "bl", "kl", "fl", "k", "au"]}, {"id": "e06", "texto": "O globo inglês reflete a glória completa do atleta.", "fonemas": ["gl", "fl", "pl", "ʒ", "ɛ", "t"]}, {"id": "e07", "texto": "Ele transporta o instrumento com destreza e perspicácia.", "fonemas": ["tr", "str", "sp", "p", "z", "s"]}]}, {"id": "prosodia", "titulo": "Bloco 5 — Frases longas e prosódia", "instrucao": "Frases mais longas, com vírgulas e entonação natural. Leia como se estivesse explicando para alguém.", "tipo": "audio_video", "itens": [{"id": "p01", "texto": "Quando o sol nasce sobre o mar, os pescadores já prepararam os barcos, verificaram as redes e conferiram a previsão do tempo para o dia inteiro.", "fonemas": ["prosodia_longa"]}, {"id": "p02", "texto": "Se você quiser entender um assunto de verdade, precisa estudar com calma, fazer perguntas difíceis e, principalmente, tentar explicar para outra pessoa.", "fonemas": ["prosodia_longa"]}, {"id": "p03", "texto": "A tecnologia mudou a forma como trabalhamos, nos comunicamos e até como descansamos; por isso, vale a pena usá-la com atenção e propósito.", "fonemas": ["prosodia_longa"]}, {"id": "p04", "texto": "Ontem à noite, depois de uma reunião longa, resolvi caminhar até o porto só para ver os barcos balançando devagar na água escura.", "fonemas": ["prosodia_longa"]}, {"id": "p05", "texto": "Números impressionam, mas histórias convencem: um milhão, cento e quarenta mil e cinquenta e nove embarcações registradas contam uma história e tanto.", "fonemas": ["prosodia_numeros"]}]}, {"id": "estilos", "titulo": "Bloco 6 — Estilos expressivos", "instrucao": "Cada item indica a emoção entre colchetes. Interprete de verdade — essa variação melhora muito a naturalidade da voz gerada.", "tipo": "audio_video", "itens": [{"id": "s01", "texto": "[NEUTRO] Hoje vamos falar sobre um assunto que interessa a todo mundo que trabalha com o mar.", "estilo": "neutro", "fonemas": ["estilo"]}, {"id": "s02", "texto": "[ENTUSIASMADO] Isso é incrível! Os resultados superaram tudo o que a gente esperava para este ano!", "estilo": "entusiasmado", "fonemas": ["estilo"]}, {"id": "s03", "texto": "[SÉRIO] Precisamos falar com franqueza: os dados mostram um problema que não pode mais ser ignorado.", "estilo": "serio", "fonemas": ["estilo"]}, {"id": "s04", "texto": "[PERGUNTA] Você já parou para pensar quantas embarcações existem registradas no Brasil? E quantas estão realmente ativas?", "estilo": "interrogativo", "fonemas": ["estilo"]}, {"id": "s05", "texto": "[SORRINDO] Pois é, no fim deu tudo certo. E olha que no começo ninguém acreditava nessa ideia.", "estilo": "sorridente", "fonemas": ["estilo"]}, {"id": "s06", "texto": "[PAUSADO] Um ponto de cada vez. Primeiro, o problema. Depois, a causa. Por fim, a solução.", "estilo": "pausado", "fonemas": ["estilo"]}, {"id": "s07", "texto": "[EMPOLGADO CONTIDO] Tenho uma novidade para contar. Algo que a gente vem preparando há meses, em silêncio.", "estilo": "suspense", "fonemas": ["estilo"]}]}, {"id": "dominio", "titulo": "Bloco 7 — Vocabulário do seu domínio", "instrucao": "Termos náuticos e de negócio que você usa com frequência — ajuda o modelo a acertar pronúncia de jargão. Edite este bloco à vontade para o seu vocabulário real.", "tipo": "audio_video", "itens": [{"id": "d01", "texto": "A SAFEBOAT nasceu para transformar a segurança náutica no Brasil.", "fonemas": ["dominio"]}, {"id": "d02", "texto": "Capitania dos Portos, Diretoria de Portos e Costas, Tribunal Marítimo e Marinha do Brasil.", "fonemas": ["dominio"]}, {"id": "d03", "texto": "Lancha, veleiro, jet ski, rebocador, balsa, pesqueiro, catamarã e embarcação miúda.", "fonemas": ["dominio"]}, {"id": "d04", "texto": "Arqueação bruta, casco, motor de popa, marina, atracadouro e navegação de cabotagem.", "fonemas": ["dominio"]}, {"id": "d05", "texto": "São mais de um milhão de embarcações registradas, e quase metade em esporte e recreio.", "fonemas": ["dominio"]}, {"id": "d06", "texto": "Santa Catarina, Itajaí, Florianópolis, Balneário Camboriú, São Francisco do Sul e Laguna.", "fonemas": ["dominio"]}]}, {"id": "visual", "titulo": "Bloco 8 — Capturas visuais para o avatar", "instrucao": "Estas capturas são só de vídeo (pode ficar em silêncio). Servem de referência visual para o modelo de avatar. Mantenha o mesmo enquadramento das gravações anteriores.", "tipo": "video", "itens": [{"id": "f01", "texto": "Rosto neutro: olhe para a câmera por 10 segundos, expressão relaxada, piscando naturalmente.", "duracao_s": 10, "fonemas": ["visual"]}, {"id": "f02", "texto": "Sorriso: sorria naturalmente para a câmera por 8 segundos, como se cumprimentasse alguém.", "duracao_s": 8, "fonemas": ["visual"]}, {"id": "f03", "texto": "Movimento de cabeça: vire lentamente a cabeça para a esquerda, centro, direita, centro, levemente para cima e para baixo.", "duracao_s": 12, "fonemas": ["visual"]}, {"id": "f04", "texto": "Escuta atenta: expressão de quem está ouvindo com interesse, com pequenos acenos de cabeça, por 10 segundos.", "duracao_s": 10, "fonemas": ["visual"]}, {"id": "f05", "texto": "Fala silenciosa: conte de um a dez em voz alta, com gestos naturais de mão se costuma usá-los.", "duracao_s": 12, "fonemas": ["visual"]}]}]}
+</script>
+<script>
+"use strict";
+
+// ---------- Estado ----------
+let corpus = null;
+let itens = [];            // lista achatada: {bloco, item}
+let idx = 0;
+let stream = null;
+let recorder = null;
+let chunks = [];
+let blobAtual = null;      // gravação ainda não aceita
+let db = null;
+
+const $ = id => document.getElementById(id);
+
+// ---------- IndexedDB ----------
+function abrirDB() {
+  return new Promise((res, rej) => {
+    const req = indexedDB.open("estudio-gravacao", 1);
+    req.onupgradeneeded = () => req.result.createObjectStore("gravacoes", { keyPath: "id" });
+    req.onsuccess = () => res(req.result);
+    req.onerror = () => rej(req.error);
+  });
+}
+function dbPut(reg) {
+  return new Promise((res, rej) => {
+    const tx = db.transaction("gravacoes", "readwrite");
+    tx.objectStore("gravacoes").put(reg);
+    tx.oncomplete = res; tx.onerror = () => rej(tx.error);
+  });
+}
+function dbGet(id) {
+  return new Promise((res, rej) => {
+    const req = db.transaction("gravacoes").objectStore("gravacoes").get(id);
+    req.onsuccess = () => res(req.result); req.onerror = () => rej(req.error);
+  });
+}
+function dbTodas() {
+  return new Promise((res, rej) => {
+    const req = db.transaction("gravacoes").objectStore("gravacoes").getAll();
+    req.onsuccess = () => res(req.result); req.onerror = () => rej(req.error);
+  });
+}
+function dbLimpar() {
+  return new Promise((res, rej) => {
+    const tx = db.transaction("gravacoes", "readwrite");
+    tx.objectStore("gravacoes").clear();
+    tx.oncomplete = res; tx.onerror = () => rej(tx.error);
+  });
+}
+
+// ---------- Inicialização ----------
+async function init() {
+  try {
+    db = await abrirDB();
+  } catch (e) {
+    const el = $("erro-fatal");
+    el.style.display = "block";
+    el.innerHTML = "<strong>Não consegui inicializar o armazenamento local.</strong><br>" +
+      "Verifique se o navegador não está em modo anônimo/privado. Detalhe: " + e.message;
+    return;
+  }
+  // Tenta o corpus.json externo (permite editar as frases sem tocar no HTML);
+  // se falhar (ex.: página aberta direto do arquivo), usa a cópia embutida.
+  try {
+    const resp = await fetch("roteiros/corpus.json");
+    if (!resp.ok) throw new Error("HTTP " + resp.status);
+    corpus = await resp.json();
+  } catch (_) {
+    corpus = JSON.parse($("corpus-embutido").textContent);
+  }
+  corpus.blocos.forEach(b => b.itens.forEach(it => itens.push({ bloco: b, item: it })));
+  await renderTudo();
+  mostrarItem(0);
+}
+
+async function estadoAceitos() {
+  const regs = await dbTodas();
+  return new Set(regs.filter(r => r.aceito).map(r => r.id));
+}
+
+async function renderTudo() {
+  const aceitos = await estadoAceitos();
+  // sidebar de blocos
+  const cont = $("lista-blocos");
+  cont.innerHTML = "";
+  corpus.blocos.forEach(b => {
+    const feitos = b.itens.filter(it => aceitos.has(it.id)).length;
+    const div = document.createElement("div");
+    div.className = "bloco-item" + (itens[idx] && itens[idx].bloco.id === b.id ? " ativo" : "");
+    div.innerHTML = `<span>${b.titulo.replace(/^Bloco \d+ — /, "")}</span>` +
+      `<span class="prog${feitos === b.itens.length ? " completo" : ""}">${feitos}/${b.itens.length}</span>`;
+    div.onclick = () => mostrarItem(itens.findIndex(x => x.bloco.id === b.id));
+    cont.appendChild(div);
+  });
+  // cobertura fonética (só fonemas reais, não marcadores como "estilo"/"visual")
+  const meta = new Set(["prosodia_longa", "prosodia_numeros", "estilo", "dominio", "visual"]);
+  const alvo = corpus.fonemas_alvo;
+  const cobertos = new Set();
+  itens.forEach(({ item }) => {
+    if (aceitos.has(item.id)) (item.fonemas || []).forEach(f => { if (!meta.has(f)) cobertos.add(f); });
+  });
+  const pct = Math.round(100 * alvo.filter(f => cobertos.has(f)).length / alvo.length);
+  $("barra-cobertura").style.width = pct + "%";
+  $("pct-cobertura").textContent = pct + "% dos fonemas-alvo cobertos · " + aceitos.size + "/" + itens.length + " gravações";
+  const faltam = alvo.filter(f => !cobertos.has(f));
+  $("fonemas-faltando").textContent = faltam.length && pct > 0 ? "Faltam: " + faltam.join(" ") : "";
+}
+
+// ---------- Navegação ----------
+async function mostrarItem(i) {
+  if (i < 0 || i >= itens.length) return;
+  idx = i;
+  blobAtual = null;
+  const { bloco, item } = itens[idx];
+  $("card-item").style.display = "block";
+  $("titulo-bloco").textContent = bloco.titulo + (bloco.tipo === "video" ? " (somente vídeo)" : "");
+  $("instrucao-bloco").textContent = bloco.instrucao;
+  $("texto-item").textContent = item.texto;
+  $("posicao").textContent = (idx + 1) + " / " + itens.length;
+  $("playback").style.display = "none";
+  $("controles-revisao").style.display = "none";
+  $("status-rec").textContent = "";
+
+  const reg = await dbGet(item.id);
+  if (reg && reg.aceito) {
+    $("badge-estado").textContent = "✓ aceito";
+    $("badge-estado").className = "badge aceito";
+    const url = URL.createObjectURL(reg.blob);
+    $("playback").src = url;
+    $("playback").style.display = "block";
+    $("controles-revisao").style.display = "flex";
+    $("btn-aceitar").style.display = "none";
+  } else {
+    $("badge-estado").textContent = "não gravado";
+    $("badge-estado").className = "badge";
+    $("btn-aceitar").style.display = "";
+  }
+  renderTudo();
+}
+
+// ---------- Câmera ----------
+let cameraFrontal = true;
+
+async function ligarCamera() {
+  if (stream) stream.getTracks().forEach(t => t.stop());
+  stream = await navigator.mediaDevices.getUserMedia({
+    video: { facingMode: cameraFrontal ? "user" : "environment",
+             width: { ideal: 1280 }, height: { ideal: 720 }, frameRate: { ideal: 30 } },
+    audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false,
+             sampleRate: 48000, channelCount: 1 }
+  });
+  $("preview").srcObject = stream;
+  // espelha só a câmera frontal (selfie)
+  $("preview").style.transform = cameraFrontal ? "scaleX(-1)" : "none";
+}
+
+$("btn-camera").onclick = async () => {
+  try {
+    await ligarCamera();
+    $("status-media").textContent = "câmera e microfone ativos";
+    $("btn-gravar").disabled = false;
+    $("btn-camera").disabled = true;
+    $("btn-virar").style.display = "";
+  } catch (e) {
+    let msg = e.message;
+    if (!window.isSecureContext)
+      msg = "esta página precisa ser aberta por HTTPS para usar a câmera (no celular, use o endereço https:// publicado)";
+    $("status-media").textContent = "erro: " + msg;
+  }
+};
+
+$("btn-virar").onclick = async () => {
+  if (recorder && recorder.state === "recording") return; // não troca no meio da gravação
+  cameraFrontal = !cameraFrontal;
+  try { await ligarCamera(); } catch (e) { $("status-media").textContent = "erro: " + e.message; }
+};
+
+// ---------- Gravação ----------
+function mimePreferido() {
+  const opcoes = ["video/webm;codecs=vp9,opus", "video/webm;codecs=vp8,opus", "video/webm", "video/mp4"];
+  return opcoes.find(m => MediaRecorder.isTypeSupported(m)) || "";
+}
+
+$("btn-gravar").onclick = () => {
+  chunks = [];
+  const mime = mimePreferido();
+  recorder = new MediaRecorder(stream, mime ? { mimeType: mime, videoBitsPerSecond: 5_000_000 } : undefined);
+  recorder.ondataavailable = e => { if (e.data.size) chunks.push(e.data); };
+  recorder.onstop = () => {
+    blobAtual = new Blob(chunks, { type: recorder.mimeType });
+    const url = URL.createObjectURL(blobAtual);
+    $("playback").src = url;
+    $("playback").style.display = "block";
+    $("controles-revisao").style.display = "flex";
+    $("btn-aceitar").style.display = "";
+    $("status-rec").textContent = "revise a gravação abaixo";
+    $("status-rec").className = "status";
+  };
+  recorder.start();
+  $("btn-gravar").disabled = true;
+  $("btn-parar").disabled = false;
+  $("status-rec").textContent = "● GRAVANDO — 1s de silêncio, fale, 1s de silêncio";
+  $("status-rec").className = "status gravando";
+};
+
+$("btn-parar").onclick = () => {
+  recorder.stop();
+  $("btn-gravar").disabled = false;
+  $("btn-parar").disabled = true;
+};
+
+$("btn-aceitar").onclick = async () => {
+  const { bloco, item } = itens[idx];
+  if (blobAtual) {
+    await dbPut({
+      id: item.id, blocoId: bloco.id, texto: item.texto, estilo: item.estilo || null,
+      tipo: bloco.tipo, mime: blobAtual.type, blob: blobAtual, aceito: true,
+      gravadoEm: new Date().toISOString()
+    });
+  } else {
+    const reg = await dbGet(item.id);
+    if (reg) { reg.aceito = true; await dbPut(reg); }
+  }
+  if (idx + 1 < itens.length) mostrarItem(idx + 1); else { await renderTudo(); alert("🎉 Todas as gravações concluídas! Use 'Exportar dataset' na barra lateral."); }
+};
+
+$("btn-regravar").onclick = () => {
+  blobAtual = null;
+  $("playback").style.display = "none";
+  $("controles-revisao").style.display = "none";
+  $("status-rec").textContent = "pronto para regravar";
+};
+
+$("btn-ant").onclick = () => mostrarItem(idx - 1);
+$("btn-prox").onclick = () => mostrarItem(idx + 1);
+
+$("btn-limpar").onclick = async () => {
+  if (confirm("Apagar TODAS as gravações salvas neste navegador? Isso não pode ser desfeito.")) {
+    await dbLimpar();
+    mostrarItem(0);
+  }
+};
+
+// ---------- Exportação ZIP (armazenado, sem compressão — vídeo já é comprimido) ----------
+const tabelaCRC = (() => {
+  const t = new Uint32Array(256);
+  for (let n = 0; n < 256; n++) {
+    let c = n;
+    for (let k = 0; k < 8; k++) c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
+    t[n] = c >>> 0;
+  }
+  return t;
+})();
+function crc32(buf) {
+  let c = 0xFFFFFFFF;
+  for (let i = 0; i < buf.length; i++) c = tabelaCRC[(c ^ buf[i]) & 0xFF] ^ (c >>> 8);
+  return (c ^ 0xFFFFFFFF) >>> 0;
+}
+function montarZip(arquivos) { // [{nome, dados:Uint8Array}]
+  const enc = new TextEncoder();
+  const partes = [], central = [];
+  let offset = 0;
+  for (const arq of arquivos) {
+    const nome = enc.encode(arq.nome);
+    const crc = crc32(arq.dados);
+    const local = new DataView(new ArrayBuffer(30));
+    local.setUint32(0, 0x04034b50, true);
+    local.setUint16(4, 20, true);           // versão
+    local.setUint16(8, 0, true);            // método: armazenado
+    local.setUint32(14, crc, true);
+    local.setUint32(18, arq.dados.length, true);
+    local.setUint32(22, arq.dados.length, true);
+    local.setUint16(26, nome.length, true);
+    partes.push(new Uint8Array(local.buffer), nome, arq.dados);
+
+    const cen = new DataView(new ArrayBuffer(46));
+    cen.setUint32(0, 0x02014b50, true);
+    cen.setUint16(4, 20, true); cen.setUint16(6, 20, true);
+    cen.setUint32(16, crc, true);
+    cen.setUint32(20, arq.dados.length, true);
+    cen.setUint32(24, arq.dados.length, true);
+    cen.setUint16(28, nome.length, true);
+    cen.setUint32(42, offset, true);
+    central.push(new Uint8Array(cen.buffer), nome);
+    offset += 30 + nome.length + arq.dados.length;
+  }
+  const tamCentral = central.reduce((s, p) => s + p.length, 0);
+  const fim = new DataView(new ArrayBuffer(22));
+  fim.setUint32(0, 0x06054b50, true);
+  fim.setUint16(8, arquivos.length, true);
+  fim.setUint16(10, arquivos.length, true);
+  fim.setUint32(12, tamCentral, true);
+  fim.setUint32(16, offset, true);
+  return new Blob([...partes, ...central, new Uint8Array(fim.buffer)], { type: "application/zip" });
+}
+
+$("btn-exportar").onclick = async () => {
+  const regs = (await dbTodas()).filter(r => r.aceito);
+  if (!regs.length) { alert("Nenhuma gravação aceita ainda."); return; }
+  $("btn-exportar").disabled = true;
+  $("btn-exportar").textContent = "Empacotando…";
+  try {
+    const arquivos = [];
+    const manifesto = { versao: corpus.versao, idioma: corpus.idioma,
+      exportadoEm: new Date().toISOString(), gravacoes: [] };
+    for (const r of regs) {
+      const ext = r.mime.includes("mp4") ? "mp4" : "webm";
+      const nome = `gravacoes/${r.blocoId}/${r.id}.${ext}`;
+      arquivos.push({ nome, dados: new Uint8Array(await r.blob.arrayBuffer()) });
+      manifesto.gravacoes.push({ id: r.id, arquivo: nome, bloco: r.blocoId, tipo: r.tipo,
+        texto: r.texto, estilo: r.estilo, mime: r.mime, gravadoEm: r.gravadoEm });
+    }
+    arquivos.push({ nome: "metadados.json",
+      dados: new TextEncoder().encode(JSON.stringify(manifesto, null, 2)) });
+    const zip = montarZip(arquivos);
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(zip);
+    a.download = "dataset-avatar-" + new Date().toISOString().slice(0, 10) + ".zip";
+    a.click();
+  } finally {
+    $("btn-exportar").disabled = false;
+    $("btn-exportar").textContent = "⬇ Exportar dataset (.zip)";
+  }
+};
+
+init();
+</script>
+</body>
+</html>
