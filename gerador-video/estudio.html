@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Estúdio de Gravação · Gerador de Vídeo</title>
+<style>
+  :root {
+    --bg: #0d1117; --panel: #161b22; --border: #30363d; --text: #e6edf3;
+    --muted: #8b949e; --accent: #2f81f7; --ok: #3fb950; --rec: #f85149; --warn: #d29922;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font: 15px/1.5 system-ui, -apple-system, sans-serif; }
+  .layout { display: grid; grid-template-columns: 300px 1fr; min-height: 100vh; }
+  aside { background: var(--panel); border-right: 1px solid var(--border); padding: 20px; overflow-y: auto; }
+  main { padding: 28px; max-width: 900px; }
+  h1 { font-size: 18px; margin-bottom: 4px; }
+  .sub { color: var(--muted); font-size: 13px; margin-bottom: 20px; }
+  h2 { font-size: 15px; margin: 16px 0 8px; }
+  .bloco-item { padding: 8px 10px; border-radius: 6px; cursor: pointer; font-size: 13px;
+    display: flex; justify-content: space-between; gap: 8px; }
+  .bloco-item:hover { background: #21262d; }
+  .bloco-item.ativo { background: #1f3a5f; }
+  .bloco-item .prog { color: var(--muted); }
+  .bloco-item .prog.completo { color: var(--ok); }
+  .cobertura { margin-top: 20px; padding: 12px; border: 1px solid var(--border); border-radius: 8px; }
+  .cobertura .barra { height: 8px; background: #21262d; border-radius: 4px; overflow: hidden; margin: 8px 0; }
+  .cobertura .barra > div { height: 100%; background: var(--ok); transition: width .3s; }
+  .cobertura .faltam { font-size: 12px; color: var(--warn); word-wrap: break-word; }
+  .card { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 24px; margin-bottom: 20px; }
+  .instrucao { color: var(--muted); font-size: 14px; margin-bottom: 16px; }
+  .texto-frase { font-size: 26px; line-height: 1.4; margin: 18px 0; font-weight: 500; }
+  video { width: 100%; max-width: 640px; border-radius: 8px; background: #000; display: block; }
+  #preview { transform: scaleX(-1); }
+  .controles { display: flex; gap: 10px; margin: 16px 0; flex-wrap: wrap; align-items: center; }
+  button { background: #21262d; color: var(--text); border: 1px solid var(--border); border-radius: 6px;
+    padding: 9px 18px; font-size: 14px; cursor: pointer; }
+  button:hover:not(:disabled) { border-color: var(--muted); }
+  button:disabled { opacity: .4; cursor: not-allowed; }
+  button.primario { background: var(--accent); border-color: var(--accent); }
+  button.gravar { background: var(--rec); border-color: var(--rec); font-weight: 600; }
+  button.aceitar { background: var(--ok); border-color: var(--ok); font-weight: 600; }
+  .status { font-size: 14px; color: var(--muted); }
+  .status.gravando { color: var(--rec); font-weight: 600; }
+  .badge { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 12px;
+    background: #21262d; color: var(--muted); margin-left: 8px; }
+  .badge.aceito { background: #1a3a24; color: var(--ok); }
+  .nav { display: flex; justify-content: space-between; margin-top: 8px; }
+  .aviso { background: #2d1e12; border: 1px solid var(--warn); border-radius: 8px; padding: 14px;
+    margin-bottom: 20px; font-size: 14px; }
+  #erro-fatal { background: #3a1d1d; border: 1px solid var(--rec); border-radius: 8px; padding: 16px; margin-bottom: 20px; display: none; }
+  code { background: #21262d; padding: 2px 6px; border-radius: 4px; font-size: 13px; }
+  .dicas { font-size: 13px; color: var(--muted); }
+  .dicas li { margin: 4px 0 4px 18px; }
+</style>
+</head>
+<body>
+<div class="layout">
+  <aside>
+    <h1>🎬 Estúdio de Gravação</h1>
+    <div class="sub">Base de dados para o seu avatar de vídeo</div>
+    <div id="lista-blocos"></div>
+    <div class="cobertura">
+      <strong style="font-size:13px">Cobertura fonética</strong>
+      <div class="barra"><div id="barra-cobertura" style="width:0%"></div></div>
+      <div id="pct-cobertura" style="font-size:13px">0%</div>
+      <div class="faltam" id="fonemas-faltando"></div>
+    </div>
+    <div style="margin-top:20px; display:flex; flex-direction:column; gap:8px">
+      <button id="btn-exportar" class="primario">⬇ Exportar dataset (.zip)</button>
+      <button id="btn-limpar">🗑 Apagar todas as gravações</button>
+    </div>
+  </aside>
+
+  <main>
+    <div id="erro-fatal"></div>
+    <div class="aviso" id="aviso-setup">
+      <strong>Antes de começar:</strong>
+      <ul class="dicas">
+        <li>Ambiente <strong>silencioso</strong>, sem eco (evite salas vazias grandes).</li>
+        <li><strong>Luz frontal</strong> uniforme no rosto; fundo simples e fixo.</li>
+        <li>Enquadre <strong>rosto e ombros</strong>, olhos no terço superior da tela. Use sempre o mesmo enquadramento.</li>
+        <li>Se possível, use um microfone externo a ~20 cm da boca.</li>
+        <li>Grave tudo <strong>na mesma sessão</strong> (mesma roupa, luz e posição) — consistência importa mais que perfeição.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <video id="preview" autoplay muted playsinline></video>
+      <div class="controles">
+        <button id="btn-camera" class="primario">Ligar câmera e microfone</button>
+        <span class="status" id="status-media">câmera desligada</span>
+      </div>
+    </div>
+
+    <div class="card" id="card-item" style="display:none">
+      <div id="titulo-bloco" style="font-weight:600"></div>
+      <div class="instrucao" id="instrucao-bloco"></div>
+      <div class="texto-frase" id="texto-item"></div>
+      <div class="controles">
+        <button id="btn-gravar" class="gravar" disabled>● Gravar</button>
+        <button id="btn-parar" disabled>■ Parar</button>
+        <span class="status" id="status-rec"></span>
+        <span class="badge" id="badge-estado">não gravado</span>
+      </div>
+      <video id="playback" controls playsinline style="display:none"></video>
+      <div class="controles" id="controles-revisao" style="display:none">
+        <button id="btn-aceitar" class="aceitar">✓ Aceitar e avançar</button>
+        <button id="btn-regravar">↺ Regravar</button>
+      </div>
+      <div class="nav">
+        <button id="btn-ant">← Anterior</button>
+        <span class="status" id="posicao"></span>
+        <button id="btn-prox">Próxima →</button>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+"use strict";
+
+// ---------- Estado ----------
+let corpus = null;
+let itens = [];            // lista achatada: {bloco, item}
+let idx = 0;
+let stream = null;
+let recorder = null;
+let chunks = [];
+let blobAtual = null;      // gravação ainda não aceita
+let db = null;
+
+const $ = id => document.getElementById(id);
+
+// ---------- IndexedDB ----------
+function abrirDB() {
+  return new Promise((res, rej) => {
+    const req = indexedDB.open("estudio-gravacao", 1);
+    req.onupgradeneeded = () => req.result.createObjectStore("gravacoes", { keyPath: "id" });
+    req.onsuccess = () => res(req.result);
+    req.onerror = () => rej(req.error);
+  });
+}
+function dbPut(reg) {
+  return new Promise((res, rej) => {
+    const tx = db.transaction("gravacoes", "readwrite");
+    tx.objectStore("gravacoes").put(reg);
+    tx.oncomplete = res; tx.onerror = () => rej(tx.error);
+  });
+}
+function dbGet(id) {
+  return new Promise((res, rej) => {
+    const req = db.transaction("gravacoes").objectStore("gravacoes").get(id);
+    req.onsuccess = () => res(req.result); req.onerror = () => rej(req.error);
+  });
+}
+function dbTodas() {
+  return new Promise((res, rej) => {
+    const req = db.transaction("gravacoes").objectStore("gravacoes").getAll();
+    req.onsuccess = () => res(req.result); req.onerror = () => rej(req.error);
+  });
+}
+function dbLimpar() {
+  return new Promise((res, rej) => {
+    const tx = db.transaction("gravacoes", "readwrite");
+    tx.objectStore("gravacoes").clear();
+    tx.oncomplete = res; tx.onerror = () => rej(tx.error);
+  });
+}
+
+// ---------- Inicialização ----------
+async function init() {
+  try {
+    db = await abrirDB();
+    const resp = await fetch("roteiros/corpus.json");
+    if (!resp.ok) throw new Error("HTTP " + resp.status);
+    corpus = await resp.json();
+  } catch (e) {
+    const el = $("erro-fatal");
+    el.style.display = "block";
+    el.innerHTML = "<strong>Não consegui carregar o corpus.</strong><br>" +
+      "Abra esta página por um servidor local (o navegador bloqueia fetch em file://):<br>" +
+      "<code>npx http-server . -p 8125 -c-1</code> e acesse " +
+      "<code>http://localhost:8125/gerador-video/estudio.html</code><br>Detalhe: " + e.message;
+    return;
+  }
+  corpus.blocos.forEach(b => b.itens.forEach(it => itens.push({ bloco: b, item: it })));
+  await renderTudo();
+  mostrarItem(0);
+}
+
+async function estadoAceitos() {
+  const regs = await dbTodas();
+  return new Set(regs.filter(r => r.aceito).map(r => r.id));
+}
+
+async function renderTudo() {
+  const aceitos = await estadoAceitos();
+  // sidebar de blocos
+  const cont = $("lista-blocos");
+  cont.innerHTML = "";
+  corpus.blocos.forEach(b => {
+    const feitos = b.itens.filter(it => aceitos.has(it.id)).length;
+    const div = document.createElement("div");
+    div.className = "bloco-item" + (itens[idx] && itens[idx].bloco.id === b.id ? " ativo" : "");
+    div.innerHTML = `<span>${b.titulo.replace(/^Bloco \d+ — /, "")}</span>` +
+      `<span class="prog${feitos === b.itens.length ? " completo" : ""}">${feitos}/${b.itens.length}</span>`;
+    div.onclick = () => mostrarItem(itens.findIndex(x => x.bloco.id === b.id));
+    cont.appendChild(div);
+  });
+  // cobertura fonética (só fonemas reais, não marcadores como "estilo"/"visual")
+  const meta = new Set(["prosodia_longa", "prosodia_numeros", "estilo", "dominio", "visual"]);
+  const alvo = corpus.fonemas_alvo;
+  const cobertos = new Set();
+  itens.forEach(({ item }) => {
+    if (aceitos.has(item.id)) (item.fonemas || []).forEach(f => { if (!meta.has(f)) cobertos.add(f); });
+  });
+  const pct = Math.round(100 * alvo.filter(f => cobertos.has(f)).length / alvo.length);
+  $("barra-cobertura").style.width = pct + "%";
+  $("pct-cobertura").textContent = pct + "% dos fonemas-alvo cobertos · " + aceitos.size + "/" + itens.length + " gravações";
+  const faltam = alvo.filter(f => !cobertos.has(f));
+  $("fonemas-faltando").textContent = faltam.length && pct > 0 ? "Faltam: " + faltam.join(" ") : "";
+}
+
+// ---------- Navegação ----------
+async function mostrarItem(i) {
+  if (i < 0 || i >= itens.length) return;
+  idx = i;
+  blobAtual = null;
+  const { bloco, item } = itens[idx];
+  $("card-item").style.display = "block";
+  $("titulo-bloco").textContent = bloco.titulo + (bloco.tipo === "video" ? " (somente vídeo)" : "");
+  $("instrucao-bloco").textContent = bloco.instrucao;
+  $("texto-item").textContent = item.texto;
+  $("posicao").textContent = (idx + 1) + " / " + itens.length;
+  $("playback").style.display = "none";
+  $("controles-revisao").style.display = "none";
+  $("status-rec").textContent = "";
+
+  const reg = await dbGet(item.id);
+  if (reg && reg.aceito) {
+    $("badge-estado").textContent = "✓ aceito";
+    $("badge-estado").className = "badge aceito";
+    const url = URL.createObjectURL(reg.blob);
+    $("playback").src = url;
+    $("playback").style.display = "block";
+    $("controles-revisao").style.display = "flex";
+    $("btn-aceitar").style.display = "none";
+  } else {
+    $("badge-estado").textContent = "não gravado";
+    $("badge-estado").className = "badge";
+    $("btn-aceitar").style.display = "";
+  }
+  renderTudo();
+}
+
+// ---------- Câmera ----------
+$("btn-camera").onclick = async () => {
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({
+      video: { width: { ideal: 1280 }, height: { ideal: 720 }, frameRate: { ideal: 30 } },
+      audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false,
+               sampleRate: 48000, channelCount: 1 }
+    });
+    $("preview").srcObject = stream;
+    $("status-media").textContent = "câmera e microfone ativos";
+    $("btn-gravar").disabled = false;
+    $("btn-camera").disabled = true;
+  } catch (e) {
+    $("status-media").textContent = "erro: " + e.message;
+  }
+};
+
+// ---------- Gravação ----------
+function mimePreferido() {
+  const opcoes = ["video/webm;codecs=vp9,opus", "video/webm;codecs=vp8,opus", "video/webm", "video/mp4"];
+  return opcoes.find(m => MediaRecorder.isTypeSupported(m)) || "";
+}
+
+$("btn-gravar").onclick = () => {
+  chunks = [];
+  const mime = mimePreferido();
+  recorder = new MediaRecorder(stream, mime ? { mimeType: mime, videoBitsPerSecond: 5_000_000 } : undefined);
+  recorder.ondataavailable = e => { if (e.data.size) chunks.push(e.data); };
+  recorder.onstop = () => {
+    blobAtual = new Blob(chunks, { type: recorder.mimeType });
+    const url = URL.createObjectURL(blobAtual);
+    $("playback").src = url;
+    $("playback").style.display = "block";
+    $("controles-revisao").style.display = "flex";
+    $("btn-aceitar").style.display = "";
+    $("status-rec").textContent = "revise a gravação abaixo";
+    $("status-rec").className = "status";
+  };
+  recorder.start();
+  $("btn-gravar").disabled = true;
+  $("btn-parar").disabled = false;
+  $("status-rec").textContent = "● GRAVANDO — 1s de silêncio, fale, 1s de silêncio";
+  $("status-rec").className = "status gravando";
+};
+
+$("btn-parar").onclick = () => {
+  recorder.stop();
+  $("btn-gravar").disabled = false;
+  $("btn-parar").disabled = true;
+};
+
+$("btn-aceitar").onclick = async () => {
+  const { bloco, item } = itens[idx];
+  if (blobAtual) {
+    await dbPut({
+      id: item.id, blocoId: bloco.id, texto: item.texto, estilo: item.estilo || null,
+      tipo: bloco.tipo, mime: blobAtual.type, blob: blobAtual, aceito: true,
+      gravadoEm: new Date().toISOString()
+    });
+  } else {
+    const reg = await dbGet(item.id);
+    if (reg) { reg.aceito = true; await dbPut(reg); }
+  }
+  if (idx + 1 < itens.length) mostrarItem(idx + 1); else { await renderTudo(); alert("🎉 Todas as gravações concluídas! Use 'Exportar dataset' na barra lateral."); }
+};
+
+$("btn-regravar").onclick = () => {
+  blobAtual = null;
+  $("playback").style.display = "none";
+  $("controles-revisao").style.display = "none";
+  $("status-rec").textContent = "pronto para regravar";
+};
+
+$("btn-ant").onclick = () => mostrarItem(idx - 1);
+$("btn-prox").onclick = () => mostrarItem(idx + 1);
+
+$("btn-limpar").onclick = async () => {
+  if (confirm("Apagar TODAS as gravações salvas neste navegador? Isso não pode ser desfeito.")) {
+    await dbLimpar();
+    mostrarItem(0);
+  }
+};
+
+// ---------- Exportação ZIP (armazenado, sem compressão — vídeo já é comprimido) ----------
+const tabelaCRC = (() => {
+  const t = new Uint32Array(256);
+  for (let n = 0; n < 256; n++) {
+    let c = n;
+    for (let k = 0; k < 8; k++) c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
+    t[n] = c >>> 0;
+  }
+  return t;
+})();
+function crc32(buf) {
+  let c = 0xFFFFFFFF;
+  for (let i = 0; i < buf.length; i++) c = tabelaCRC[(c ^ buf[i]) & 0xFF] ^ (c >>> 8);
+  return (c ^ 0xFFFFFFFF) >>> 0;
+}
+function montarZip(arquivos) { // [{nome, dados:Uint8Array}]
+  const enc = new TextEncoder();
+  const partes = [], central = [];
+  let offset = 0;
+  for (const arq of arquivos) {
+    const nome = enc.encode(arq.nome);
+    const crc = crc32(arq.dados);
+    const local = new DataView(new ArrayBuffer(30));
+    local.setUint32(0, 0x04034b50, true);
+    local.setUint16(4, 20, true);           // versão
+    local.setUint16(8, 0, true);            // método: armazenado
+    local.setUint32(14, crc, true);
+    local.setUint32(18, arq.dados.length, true);
+    local.setUint32(22, arq.dados.length, true);
+    local.setUint16(26, nome.length, true);
+    partes.push(new Uint8Array(local.buffer), nome, arq.dados);
+
+    const cen = new DataView(new ArrayBuffer(46));
+    cen.setUint32(0, 0x02014b50, true);
+    cen.setUint16(4, 20, true); cen.setUint16(6, 20, true);
+    cen.setUint32(16, crc, true);
+    cen.setUint32(20, arq.dados.length, true);
+    cen.setUint32(24, arq.dados.length, true);
+    cen.setUint16(28, nome.length, true);
+    cen.setUint32(42, offset, true);
+    central.push(new Uint8Array(cen.buffer), nome);
+    offset += 30 + nome.length + arq.dados.length;
+  }
+  const tamCentral = central.reduce((s, p) => s + p.length, 0);
+  const fim = new DataView(new ArrayBuffer(22));
+  fim.setUint32(0, 0x06054b50, true);
+  fim.setUint16(8, arquivos.length, true);
+  fim.setUint16(10, arquivos.length, true);
+  fim.setUint32(12, tamCentral, true);
+  fim.setUint32(16, offset, true);
+  return new Blob([...partes, ...central, new Uint8Array(fim.buffer)], { type: "application/zip" });
+}
+
+$("btn-exportar").onclick = async () => {
+  const regs = (await dbTodas()).filter(r => r.aceito);
+  if (!regs.length) { alert("Nenhuma gravação aceita ainda."); return; }
+  $("btn-exportar").disabled = true;
+  $("btn-exportar").textContent = "Empacotando…";
+  try {
+    const arquivos = [];
+    const manifesto = { versao: corpus.versao, idioma: corpus.idioma,
+      exportadoEm: new Date().toISOString(), gravacoes: [] };
+    for (const r of regs) {
+      const ext = r.mime.includes("mp4") ? "mp4" : "webm";
+      const nome = `gravacoes/${r.blocoId}/${r.id}.${ext}`;
+      arquivos.push({ nome, dados: new Uint8Array(await r.blob.arrayBuffer()) });
+      manifesto.gravacoes.push({ id: r.id, arquivo: nome, bloco: r.blocoId, tipo: r.tipo,
+        texto: r.texto, estilo: r.estilo, mime: r.mime, gravadoEm: r.gravadoEm });
+    }
+    arquivos.push({ nome: "metadados.json",
+      dados: new TextEncoder().encode(JSON.stringify(manifesto, null, 2)) });
+    const zip = montarZip(arquivos);
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(zip);
+    a.download = "dataset-avatar-" + new Date().toISOString().slice(0, 10) + ".zip";
+    a.click();
+  } finally {
+    $("btn-exportar").disabled = false;
+    $("btn-exportar").textContent = "⬇ Exportar dataset (.zip)";
+  }
+};
+
+init();
+</script>
+</body>
+</html>
