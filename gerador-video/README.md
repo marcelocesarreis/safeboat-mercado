@@ -43,6 +43,20 @@ gerador-video/
 
 ### 1. Gravar a base de dados
 
+**Pelo celular (recomendado):** abra no navegador do celular o endereço
+publicado pelo GitHub Pages —
+
+```
+https://marcelocesarreis.github.io/safeboat-mercado/gerador-video/estudio.html
+```
+
+O HTTPS do Pages é o que libera câmera e microfone no celular. Use o aparelho
+na horizontal, apoiado, na altura dos olhos. As gravações ficam só no navegador
+e no zip exportado — nunca são enviadas ao repositório.
+
+**Pelo computador:** dê duplo clique em `estudio.html` (o corpus está embutido
+na página) ou sirva localmente:
+
 ```bash
 # na raiz do repositório
 npx http-server . -p 8125 -c-1
