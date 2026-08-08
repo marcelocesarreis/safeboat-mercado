@@ -51,6 +51,12 @@ def carregar_config() -> dict:
     sys.exit("Nenhum config.yaml encontrado em pipeline/.")
 
 
+def caminho(valor: str) -> Path:
+    """Resolve caminhos do config relativos à pasta pipeline/, não ao CWD."""
+    p = Path(valor).expanduser()
+    return p if p.is_absolute() else (AQUI / p).resolve()
+
+
 # ---------------------------------------------------------------- roteiro
 def gerar_roteiro(prompt: str) -> str:
     import anthropic
@@ -84,14 +90,15 @@ def sintetizar_voz(texto: str, cfg: dict, saida: Path) -> None:
 
 
 def _tts_xtts(texto: str, cfg: dict, saida: Path) -> None:
-    """XTTS-v2 (Coqui TTS) — local, gratuito. pip install TTS. Clona a voz
-    a partir dos wavs de referência gerados por preparar_dataset.py."""
+    """XTTS-v2 (Coqui TTS) — local, gratuito. pip install coqui-tts. Clona a
+    voz a partir dos wavs de referência gerados por preparar_dataset.py."""
+    os.environ.setdefault("COQUI_TOS_AGREED", "1")  # aceita a licença CPML (uso pessoal)
     try:
         from TTS.api import TTS  # type: ignore
     except ImportError:
-        sys.exit("Instale o Coqui TTS: pip install TTS  (requer Python <=3.11)")
+        sys.exit("Instale o Coqui TTS: pip install coqui-tts")
 
-    refs = sorted(Path(cfg["dataset"]).joinpath("referencia/voz").glob("*.wav"))
+    refs = sorted(caminho(cfg["dataset"]).joinpath("referencia/voz").glob("*.wav"))
     if not refs:
         sys.exit("Sem wavs de referência — rode preparar_dataset.py primeiro.")
 
@@ -141,16 +148,17 @@ def gerar_avatar(audio: Path, cfg: dict, saida: Path) -> None:
 def _video_sadtalker(audio: Path, cfg: dict, saida: Path) -> None:
     """SadTalker — gera cabeça falante a partir de UMA foto + áudio.
     Clone https://github.com/OpenTalker/SadTalker e aponte video.sadtalker_dir."""
-    sad_dir = Path(cfg["video"]["sadtalker_dir"]).expanduser()
-    rosto = Path(cfg["dataset"]) / "referencia" / "rosto.png"
+    sad_dir = caminho(cfg["video"]["sadtalker_dir"])
+    rosto = caminho(cfg["dataset"]) / "referencia" / "rosto.png"
+    py = str(caminho(cfg["video"]["python"])) if cfg["video"].get("python") else sys.executable
     if not sad_dir.exists():
-        sys.exit(f"SadTalker não encontrado em {sad_dir} — clone o repositório e ajuste o config.")
+        sys.exit(f"SadTalker não encontrado em {sad_dir} — rode o instalar.sh ou ajuste o config.")
     if not rosto.exists():
         sys.exit("referencia/rosto.png ausente — grave o item f01 e rode preparar_dataset.py.")
 
     tmp_out = saida.parent / "sadtalker_out"
     proc = subprocess.run(
-        [sys.executable, "inference.py",
+        [py, "inference.py",
          "--driven_audio", str(audio.resolve()),
          "--source_image", str(rosto.resolve()),
          "--result_dir", str(tmp_out.resolve()),
@@ -168,15 +176,16 @@ def _video_sadtalker(audio: Path, cfg: dict, saida: Path) -> None:
 def _video_wav2lip(audio: Path, cfg: dict, saida: Path) -> None:
     """Wav2Lip — sincroniza lábios sobre um VÍDEO seu real (referencia/rosto.mp4).
     Resultado mais 'você' que foto animada. Clone https://github.com/Rudrabha/Wav2Lip."""
-    w2l_dir = Path(cfg["video"]["wav2lip_dir"]).expanduser()
-    base = Path(cfg["dataset"]) / "referencia" / "rosto.mp4"
+    w2l_dir = caminho(cfg["video"]["wav2lip_dir"])
+    base = caminho(cfg["dataset"]) / "referencia" / "rosto.mp4"
+    py = str(caminho(cfg["video"]["python"])) if cfg["video"].get("python") else sys.executable
     if not w2l_dir.exists():
         sys.exit(f"Wav2Lip não encontrado em {w2l_dir}.")
     if not base.exists():
         sys.exit("referencia/rosto.mp4 ausente — grave o item f03 e rode preparar_dataset.py.")
 
     proc = subprocess.run(
-        [sys.executable, "inference.py",
+        [py, "inference.py",
          "--checkpoint_path", "checkpoints/wav2lip_gan.pth",
          "--face", str(base.resolve()),
          "--audio", str(audio.resolve()),
@@ -210,7 +219,7 @@ def main() -> None:
 
     cfg = carregar_config()
     carimbo = datetime.now().strftime("%Y%m%d-%H%M%S")
-    trabalho = Path(cfg.get("saida_dir", "saida")) / carimbo
+    trabalho = caminho(cfg.get("saida_dir", "../saida")) / carimbo
     trabalho.mkdir(parents=True, exist_ok=True)
 
     # 1. roteiro

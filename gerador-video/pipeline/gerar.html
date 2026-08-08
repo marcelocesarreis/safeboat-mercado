@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Estúdio de Geração · SAFEBOAT | NAVALCARE</title>
+<style>
+  :root {
+    --navy: #2D324B; --ink: #1A1F2B; --bg: #F0F1F5; --card: #FFFFFF;
+    --line: #DDDFE6; --muted: #4E5666; --suave: #9AA0B4;
+    --blue: #2264BE; --green: #0B6B4D; --warn: #B4530A; --rec: #B03A2E;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--ink);
+    font: 15px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+
+  header.topo { background: var(--navy); color: #fff; padding: 10px 20px;
+    display: flex; align-items: center; gap: 14px; }
+  .marca { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+  .marca .safeboat { font-size: 19px; font-weight: 800; letter-spacing: .12em; }
+  .marca .por { font-size: 11px; color: #9AA0B4; letter-spacing: .08em; }
+  .marca .navalcare { font-size: 13px; font-weight: 600; letter-spacing: .22em; color: #C9CDD9; }
+  header.topo .app { margin-left: auto; font-size: 12px; color: #C9CDD9; letter-spacing: .06em;
+    text-transform: uppercase; }
+  header.topo a { color: #C9CDD9; font-size: 13px; text-decoration: none; }
+  header.topo a:hover { color: #fff; }
+
+  .conteudo { max-width: 860px; margin: 0 auto; padding: 24px 16px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px;
+    padding: 20px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(26,31,43,.06); }
+  .card h2 { font-size: 15px; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+  .num { background: var(--navy); color: #fff; border-radius: 50%; width: 24px; height: 24px;
+    display: inline-flex; align-items: center; justify-content: center; font-size: 13px; }
+
+  textarea { width: 100%; border: 1px solid var(--line); border-radius: 8px; padding: 12px;
+    font: 15px/1.5 inherit; resize: vertical; background: #FAFBFC; }
+  textarea:focus { outline: 2px solid var(--blue); border-color: transparent; }
+  #prompt { min-height: 84px; }
+  #roteiro { min-height: 150px; }
+
+  .linha { display: flex; gap: 10px; margin-top: 12px; align-items: center; flex-wrap: wrap; }
+  button { background: #EEF0F4; color: var(--ink); border: 1px solid var(--line);
+    border-radius: 8px; padding: 11px 20px; font-size: 14.5px; cursor: pointer; font-weight: 600; }
+  button:hover:not(:disabled) { border-color: var(--suave); }
+  button:disabled { opacity: .45; cursor: not-allowed; }
+  button.primario { background: var(--blue); border-color: var(--blue); color: #fff; }
+  button.gerar { background: var(--green); border-color: var(--green); color: #fff; }
+
+  .nota { font-size: 13px; color: var(--muted); margin-top: 8px; }
+  .erro { background: #FBF1EE; border: 1px solid var(--rec); color: #5C2A1E;
+    border-radius: 8px; padding: 12px 14px; margin-top: 12px; font-size: 14px; display: none; }
+
+  /* progresso */
+  .progresso { display: none; align-items: center; gap: 14px; }
+  .spinner { width: 26px; height: 26px; border: 3px solid var(--line); border-top-color: var(--blue);
+    border-radius: 50%; animation: gira 1s linear infinite; flex: none; }
+  @keyframes gira { to { transform: rotate(360deg); } }
+  .etapas { display: flex; gap: 6px; margin-top: 12px; flex-wrap: wrap; }
+  .etapa { font-size: 12.5px; padding: 4px 12px; border-radius: 14px; background: #EEF0F4;
+    color: var(--suave); border: 1px solid var(--line); }
+  .etapa.ativa { background: #F1F6FD; color: var(--blue); border-color: #CFDFF5; font-weight: 700; }
+  .etapa.feita { background: #E9F7EF; color: var(--green); border-color: #BFE5CE; }
+
+  video { width: 100%; border-radius: 10px; background: #000; margin-top: 8px; }
+  .resultado { display: none; }
+  a.baixar { display: inline-block; margin-top: 10px; color: var(--blue); font-weight: 600; }
+</style>
+</head>
+<body>
+
+<header class="topo">
+  <div class="marca">
+    <span class="safeboat">SAFEBOAT</span>
+    <span class="por">por</span>
+    <span class="navalcare">NAVALCARE</span>
+  </div>
+  <span class="app">Estúdio de Geração</span>
+  <a href="/estudio.html">🎬 Estúdio de Gravação →</a>
+</header>
+
+<div class="conteudo">
+
+  <div class="card">
+    <h2><span class="num">1</span> O que o vídeo deve dizer?</h2>
+    <textarea id="prompt" placeholder="Ex.: Vídeo de 40 segundos explicando por que toda lancha precisa estar registrada na Capitania dos Portos. Tom didático e direto, terminando com um convite para conhecer a SAFEBOAT."></textarea>
+    <div class="linha">
+      <button id="btn-roteiro" class="primario">✍ Gerar roteiro com Claude</button>
+      <span class="nota">ou escreva/cole o roteiro direto no passo 2</span>
+    </div>
+    <div class="erro" id="erro-roteiro"></div>
+  </div>
+
+  <div class="card">
+    <h2><span class="num">2</span> Roteiro (revise e edite à vontade)</h2>
+    <textarea id="roteiro" placeholder="O texto exato que a sua voz vai falar…"></textarea>
+    <div class="linha">
+      <button id="btn-gerar" class="gerar">🎥 Gerar vídeo</button>
+      <span class="nota">voz clonada + avatar rodando na sua máquina — a primeira geração é a mais lenta (baixa modelos)</span>
+    </div>
+    <div class="erro" id="erro-gerar"></div>
+  </div>
+
+  <div class="card" id="card-progresso" style="display:none">
+    <h2><span class="num">3</span> Gerando…</h2>
+    <div class="progresso" style="display:flex">
+      <div class="spinner"></div>
+      <div id="detalhe-progresso">Preparando…</div>
+    </div>
+    <div class="etapas">
+      <span class="etapa" data-e="voz">① Voz</span>
+      <span class="etapa" data-e="avatar">② Avatar</span>
+      <span class="etapa" data-e="finalizando">③ Finalização</span>
+    </div>
+  </div>
+
+  <div class="card resultado" id="card-resultado">
+    <h2><span class="num">✓</span> Vídeo pronto</h2>
+    <video id="video-final" controls playsinline></video>
+    <a class="baixar" id="link-baixar" download>⬇ Baixar mp4</a>
+    <div class="nota">Lembrete: identifique como gerado por IA ao publicar.</div>
+  </div>
+
+</div>
+
+<script>
+"use strict";
+const $ = id => document.getElementById(id);
+let poll = null;
+
+function mostrarErro(el, msg) { el.textContent = msg; el.style.display = "block"; }
+function limparErros() { $("erro-roteiro").style.display = "none"; $("erro-gerar").style.display = "none"; }
+
+$("btn-roteiro").onclick = async () => {
+  limparErros();
+  const prompt = $("prompt").value.trim();
+  if (!prompt) { mostrarErro($("erro-roteiro"), "Descreva o vídeo no campo acima."); return; }
+  $("btn-roteiro").disabled = true;
+  $("btn-roteiro").textContent = "Escrevendo…";
+  try {
+    const r = await fetch("/api/roteiro", { method: "POST",
+      headers: { "Content-Type": "application/json" }, body: JSON.stringify({ prompt }) });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.erro || "falha ao gerar roteiro");
+    $("roteiro").value = d.roteiro;
+    $("roteiro").scrollIntoView({ behavior: "smooth", block: "center" });
+  } catch (e) {
+    mostrarErro($("erro-roteiro"), e.message);
+  } finally {
+    $("btn-roteiro").disabled = false;
+    $("btn-roteiro").textContent = "✍ Gerar roteiro com Claude";
+  }
+};
+
+$("btn-gerar").onclick = async () => {
+  limparErros();
+  const roteiro = $("roteiro").value.trim();
+  if (!roteiro) { mostrarErro($("erro-gerar"), "O roteiro está vazio — gere com o Claude ou escreva o seu."); return; }
+  const r = await fetch("/api/gerar", { method: "POST",
+    headers: { "Content-Type": "application/json" }, body: JSON.stringify({ roteiro }) });
+  const d = await r.json();
+  if (!r.ok) { mostrarErro($("erro-gerar"), d.erro || "falha ao iniciar"); return; }
+  $("btn-gerar").disabled = true;
+  $("card-resultado").style.display = "none";
+  $("card-progresso").style.display = "block";
+  $("card-progresso").scrollIntoView({ behavior: "smooth" });
+  poll = setInterval(verStatus, 2000);
+};
+
+const ORDEM = ["voz", "avatar", "finalizando"];
+async function verStatus() {
+  const s = await (await fetch("/api/status")).json();
+  $("detalhe-progresso").textContent = s.detalhe || s.etapa || "…";
+  document.querySelectorAll(".etapa").forEach(el => {
+    const e = el.dataset.e;
+    el.className = "etapa";
+    if (s.etapa === e) el.classList.add("ativa");
+    else if (ORDEM.indexOf(e) < ORDEM.indexOf(s.etapa) || s.etapa === "pronto") el.classList.add("feita");
+  });
+  if (s.etapa === "pronto") {
+    clearInterval(poll);
+    $("btn-gerar").disabled = false;
+    $("card-progresso").style.display = "none";
+    $("video-final").src = s.video;
+    $("link-baixar").href = s.video;
+    $("card-resultado").style.display = "block";
+    $("card-resultado").scrollIntoView({ behavior: "smooth" });
+  } else if (s.etapa === "erro") {
+    clearInterval(poll);
+    $("btn-gerar").disabled = false;
+    $("card-progresso").style.display = "none";
+    mostrarErro($("erro-gerar"), s.erro || "erro desconhecido");
+  }
+}
+</script>
+</body>
+</html>

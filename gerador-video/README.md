@@ -73,7 +73,28 @@ Dicas que valem ouro: mesma sessão, mesma luz, mesmo enquadramento, ambiente
 silencioso. Edite o **Bloco 7** do `corpus.json` com o vocabulário que você
 realmente usa.
 
-### 2. Preparar o dataset
+### 2. Instalação automática da rota local (grátis) — recomendado
+
+Com o zip do dataset em `~/Downloads`, um comando faz tudo — instala o motor
+de voz (XTTS-v2), o motor de avatar (SadTalker), prepara o dataset e abre o
+**Estúdio de Geração** no navegador:
+
+```bash
+git clone https://github.com/marcelocesarreis/safeboat-mercado
+cd safeboat-mercado/gerador-video
+bash instalar.sh      # Windows: rode dentro do WSL (Ubuntu)
+```
+
+No estúdio (http://localhost:8199) você digita o prompt, revisa o roteiro e
+clica em **Gerar vídeo** — sai o mp4 pronto para baixar. O botão de roteiro
+usa o Claude se `ANTHROPIC_API_KEY` estiver exportada; sem a chave, é só
+escrever ou colar o roteiro manualmente.
+
+A primeira geração baixa o modelo de voz (~2 GB) e é a mais lenta; sem GPU
+NVIDIA tudo funciona, apenas mais devagar. Os passos abaixo são o equivalente
+manual, para quem quiser controlar cada etapa.
+
+### 2b. Preparar o dataset (manual)
 
 ```bash
 cd gerador-video/pipeline
