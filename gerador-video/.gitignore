@@ -1,3 +1,7 @@
 dataset/
 saida/
 __pycache__/
+motores/
+.venv-voz/
+.venv-video/
+pipeline/config.yaml
