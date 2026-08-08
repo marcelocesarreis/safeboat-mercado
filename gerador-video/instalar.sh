@@ -32,9 +32,13 @@ if [ ! -x .venv-voz/bin/python ]; then
 fi
 info "Instalando Coqui TTS (XTTS-v2) — pode demorar, baixa o PyTorch…"
 .venv-voz/bin/pip install -q --upgrade pip
-.venv-voz/bin/pip install -q coqui-tts pyyaml requests anthropic \
-  || .venv-voz/bin/pip install -q TTS pyyaml requests anthropic \
+.venv-voz/bin/pip install -q torch torchaudio \
+  || erro "não consegui instalar o PyTorch. Cole a mensagem acima na conversa que eu ajusto."
+# transformers 5.x quebra o XTTS; o extra [codec] é exigido pelo torch >= 2.9
+.venv-voz/bin/pip install -q "coqui-tts[codec]" "transformers>=4.57,<5" pyyaml requests anthropic \
   || erro "não consegui instalar o Coqui TTS. Cole a mensagem acima na conversa que eu ajusto."
+.venv-voz/bin/python -c "from TTS.api import TTS" 2>/dev/null \
+  || erro "Coqui TTS instalado mas não importa. Cole a saída de: .venv-voz/bin/python -c 'from TTS.api import TTS'"
 ok "Motor de voz instalado"
 
 # ---------- SadTalker (avatar) ----------
@@ -56,6 +60,11 @@ if ! .venv-video/bin/pip install -q -r motores/SadTalker/requirements.txt 2>/tmp
   .venv-video/bin/pip install -q -r /tmp/sad_req_livre.txt \
     || erro "dependências do SadTalker falharam. Envie /tmp/sad_req.log na conversa que eu ajusto."
 fi
+# basicsr antigo importa um módulo removido do torchvision moderno — patch idempotente
+for DEG in .venv-video/lib/python3.*/site-packages/basicsr/data/degradations.py; do
+  [ -f "$DEG" ] && sed -i.bak \
+    's/from torchvision.transforms.functional_tensor import rgb_to_grayscale/from torchvision.transforms.functional import rgb_to_grayscale/' "$DEG"
+done
 if [ ! -f motores/SadTalker/checkpoints/SadTalker_V0.0.2_256.safetensors ]; then
   info "Baixando modelos do SadTalker (~2,5 GB)…"
   ( cd motores/SadTalker && bash scripts/download_models.sh ) \

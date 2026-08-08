@@ -52,9 +52,13 @@ def carregar_config() -> dict:
 
 
 def caminho(valor: str) -> Path:
-    """Resolve caminhos do config relativos à pasta pipeline/, não ao CWD."""
+    """Resolve caminhos do config relativos à pasta pipeline/, não ao CWD.
+
+    Não usa Path.resolve(): ele segue symlinks, e o python de um venv É um
+    symlink — resolvê-lo apontaria para o interpretador do sistema, sem os
+    pacotes do venv."""
     p = Path(valor).expanduser()
-    return p if p.is_absolute() else (AQUI / p).resolve()
+    return p if p.is_absolute() else Path(os.path.normpath(AQUI / p))
 
 
 # ---------------------------------------------------------------- roteiro
@@ -145,6 +149,15 @@ def gerar_avatar(audio: Path, cfg: dict, saida: Path) -> None:
         sys.exit(f"Backend de vídeo desconhecido: {backend}")
 
 
+def _cuda_disponivel(py: str) -> bool:
+    try:
+        r = subprocess.run([py, "-c", "import torch; print(torch.cuda.is_available())"],
+                           capture_output=True, text=True, timeout=120)
+        return r.stdout.strip() == "True"
+    except Exception:  # noqa: BLE001 — sem torch ou timeout: assume CPU
+        return False
+
+
 def _video_sadtalker(audio: Path, cfg: dict, saida: Path) -> None:
     """SadTalker — gera cabeça falante a partir de UMA foto + áudio.
     Clone https://github.com/OpenTalker/SadTalker e aponte video.sadtalker_dir."""
@@ -157,14 +170,16 @@ def _video_sadtalker(audio: Path, cfg: dict, saida: Path) -> None:
         sys.exit("referencia/rosto.png ausente — grave o item f01 e rode preparar_dataset.py.")
 
     tmp_out = saida.parent / "sadtalker_out"
-    proc = subprocess.run(
-        [py, "inference.py",
-         "--driven_audio", str(audio.resolve()),
-         "--source_image", str(rosto.resolve()),
-         "--result_dir", str(tmp_out.resolve()),
-         "--preprocess", "full", "--still", "--enhancer", "gfpgan"],
-        cwd=sad_dir, capture_output=True, text=True,
-    )
+    args = [py, "inference.py",
+            "--driven_audio", str(audio.resolve()),
+            "--source_image", str(rosto.resolve()),
+            "--result_dir", str(tmp_out.resolve()),
+            "--preprocess", "full", "--still"]
+    # GFPGAN melhora o rosto, mas em CPU custa ~10 s/quadro (horas por vídeo);
+    # só compensa com GPU.
+    if _cuda_disponivel(py):
+        args += ["--enhancer", "gfpgan"]
+    proc = subprocess.run(args, cwd=sad_dir, capture_output=True, text=True)
     if proc.returncode != 0:
         sys.exit(f"SadTalker falhou:\n{proc.stderr[-3000:]}")
     gerados = sorted(tmp_out.rglob("*.mp4"), key=lambda p: p.stat().st_mtime)
