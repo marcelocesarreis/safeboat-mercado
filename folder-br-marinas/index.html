@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>SAFEBOAT para BR Marinas</title>
+<link rel="icon" type="image/png" href="../img/logo-circulo.png">
+<style>
+  /* fontes embarcadas (Google Fonts, licença OFL) — funcionam offline e na impressão */
+@font-face { font-family: 'Josefin Sans'; font-style: normal; font-weight: 300; font-display: swap; src: url('fonts/JosefinSans-300.woff2') format('woff2'); }
+@font-face { font-family: 'Josefin Sans'; font-style: normal; font-weight: 400; font-display: swap; src: url('fonts/JosefinSans-400.woff2') format('woff2'); }
+@font-face { font-family: 'Josefin Sans'; font-style: normal; font-weight: 600; font-display: swap; src: url('fonts/JosefinSans-600.woff2') format('woff2'); }
+@font-face { font-family: 'Poppins'; font-style: normal; font-weight: 300; font-display: swap; src: url('fonts/Poppins-300.woff2') format('woff2'); }
+@font-face { font-family: 'Poppins'; font-style: normal; font-weight: 400; font-display: swap; src: url('fonts/Poppins-400.woff2') format('woff2'); }
+@font-face { font-family: 'Poppins'; font-style: normal; font-weight: 500; font-display: swap; src: url('fonts/Poppins-500.woff2') format('woff2'); }
+@font-face { font-family: 'Poppins'; font-style: normal; font-weight: 600; font-display: swap; src: url('fonts/Poppins-600.woff2') format('woff2'); }
+  /* ---------- identidade (herdada do site safeboat.tech) ---------- */
+  :root {
+    color-scheme: light;
+    --noite: #071022;
+    --navy: #23304A;
+    --navy-2: #1A2438;
+    --cyan: #3ED2F0;
+    --cyan-ink: #0B7F9E;
+    --fog: #F4F6F9;
+    --fog-2: #E9EDF3;
+    --branco: #FFFFFF;
+    --ink: #231F20;
+    --ink-2: #55607A;
+    --ink-3: #8A93A6;
+    --line: rgba(35, 48, 74, .16);
+    --line-dark: rgba(255, 255, 255, .16);
+    --alerta: #D6453D;
+    --ok: #2E8B57;
+    --display: "Josefin Sans", "Trebuchet MS", "Gill Sans", sans-serif;
+    --corpo: "Poppins", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --z: 1;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { background: #C9CED8; }
+  body {
+    font-family: var(--corpo); font-weight: 300; color: var(--ink); background: #C9CED8;
+    line-height: 1.5; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+    padding: 18px 16px 40px;
+  }
+  .toolbar {
+    max-width: 210mm; margin: 0 auto 14px; display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;
+    font-size: 12px; color: var(--navy);
+  }
+  .toolbar b { font-weight: 500; }
+  .toolbar button {
+    font: 500 12px var(--corpo); color: #fff; background: var(--navy); border: 0; border-radius: 999px; padding: 9px 18px; cursor: pointer;
+  }
+  .toolbar button:hover { background: var(--navy-2); }
+  .toolbar button:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
+
+  /* ---------- página A4 ---------- */
+  .page {
+    width: 210mm; height: 297mm; margin: 0 auto 18px; position: relative; overflow: hidden;
+    background: var(--branco); color: var(--ink);
+    box-shadow: 0 10px 30px rgba(7, 16, 34, .18);
+    padding: 16mm 15mm 19mm; display: flex; flex-direction: column;
+    zoom: var(--z);
+  }
+  .page.dark { background: var(--noite); color: #fff; }
+  .page.fog { background: var(--fog); }
+
+  .hd { display: flex; justify-content: space-between; align-items: center; height: 8mm; margin-bottom: 8mm; }
+  .hd img { height: 6.2mm; width: auto; display: block; }
+  .hd .tag { font-family: var(--display); font-weight: 400; font-size: 8pt; letter-spacing: .22em; text-transform: uppercase; color: var(--ink-2); }
+  .hd .tag b { color: var(--navy); font-weight: 600; }
+  .ft {
+    position: absolute; left: 15mm; right: 15mm; bottom: 8mm; display: flex; justify-content: space-between; align-items: baseline;
+    font-size: 7.2pt; color: var(--ink-3); border-top: 1px solid var(--line); padding-top: 2.4mm;
+  }
+  .ft .folio { font-family: var(--display); font-weight: 600; color: var(--navy); letter-spacing: .12em; }
+  .dark .ft { color: rgba(255,255,255,.55); border-top-color: var(--line-dark); }
+  .dark .ft .folio { color: var(--cyan); }
+
+  /* ---------- tipografia ---------- */
+  .eyebrow { font-family: var(--display); font-weight: 600; font-size: 8pt; letter-spacing: .24em; text-transform: uppercase; color: var(--cyan-ink); margin-bottom: 3mm; }
+  .dark .eyebrow { color: var(--cyan); }
+  h1 { font-family: var(--display); font-weight: 300; font-size: 33pt; line-height: 1.12; letter-spacing: -.005em; text-wrap: balance; }
+  h1 b, h2 b { font-weight: 600; }
+  h2 { font-family: var(--display); font-weight: 300; font-size: 22pt; line-height: 1.15; color: var(--navy); text-wrap: balance; margin-bottom: 4mm; }
+  .dark h2 { color: #fff; }
+  h3 { font-family: var(--display); font-weight: 600; font-size: 10.5pt; line-height: 1.25; color: var(--navy); letter-spacing: .01em; margin-bottom: 2mm; }
+  .dark h3 { color: #fff; }
+  h4 { font-family: var(--display); font-weight: 600; font-size: 8pt; letter-spacing: .2em; text-transform: uppercase; color: var(--ink-2); margin-bottom: 3mm; }
+  .dark h4 { color: rgba(255,255,255,.6); }
+  p { font-size: 9pt; line-height: 1.55; color: var(--ink); max-width: 68ch; }
+  p + p { margin-top: 2.4mm; }
+  .lead { font-size: 10.4pt; line-height: 1.5; color: var(--navy); font-weight: 300; }
+  .dark p { color: rgba(255,255,255,.82); }
+  .dark .lead { color: #fff; }
+  .muted { color: var(--ink-2); }
+  .small { font-size: 7.6pt; line-height: 1.45; color: var(--ink-3); }
+  .dark .small { color: rgba(255,255,255,.5); }
+  strong { font-weight: 500; }
+  .num { font-family: var(--corpo); font-weight: 600; font-variant-numeric: tabular-nums; }
+  ul { list-style: none; }
+  ul.check li { position: relative; padding-left: 5mm; font-size: 8.6pt; line-height: 1.5; margin-bottom: 1.6mm; }
+  ul.check li::before { content: ""; position: absolute; left: 0; top: .42em; width: 2.6mm; height: 2.6mm; border-radius: 50%; background: var(--cyan); }
+  .dark ul.check li::before { background: var(--cyan); }
+  ul.dash li { position: relative; padding-left: 4mm; font-size: 8.2pt; line-height: 1.45; margin-bottom: 1.1mm; color: var(--ink); }
+  ul.dash li::before { content: ""; position: absolute; left: 0; top: .7em; width: 2.2mm; height: 1px; background: var(--cyan-ink); }
+
+  /* ---------- utilitários de layout ---------- */
+  .cols { display: grid; gap: 8mm; }
+  .c2 { grid-template-columns: 1fr 1fr; }
+  .c3 { grid-template-columns: 1fr 1fr 1fr; }
+  .c4 { grid-template-columns: repeat(4, 1fr); }
+  .c6 { grid-template-columns: repeat(6, 1fr); }
+  .grow { flex: 1; }
+  .rule { height: 1px; background: var(--line); margin: 6mm 0; }
+  .dark .rule { background: var(--line-dark); }
+  .band { background: var(--fog); border-radius: 3mm; padding: 6mm 7mm; }
+  .band.navy { background: var(--navy); color: #fff; }
+  .band.navy h3, .band.navy p { color: #fff; }
+  .band.navy p { color: rgba(255,255,255,.85); }
+  .band.navy .small { color: rgba(255,255,255,.55); }
+  img.fit { max-width: 100%; height: auto; display: block; }
+
+  /* ---------- capa ---------- */
+  .capa { padding: 0; }
+  .capa .art { position: absolute; right: 0; bottom: 0; width: 122mm; height: 183mm; }
+  .capa .art img { width: 100%; height: 100%; object-fit: cover; object-position: center top; display: block; }
+  .capa .art::before { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, var(--noite) 0%, rgba(7,16,34,0) 28%); }
+  .capa .art::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, var(--noite) 0%, rgba(7,16,34,0) 22%); }
+  .capa .top { position: absolute; left: 16mm; top: 16mm; right: 16mm; display: flex; justify-content: space-between; align-items: center; }
+  .capa .top img { height: 8mm; width: auto; }
+  .capa .top .para { font-family: var(--display); font-size: 8pt; letter-spacing: .24em; text-transform: uppercase; color: rgba(255,255,255,.6); }
+  .capa .top .para b { color: #fff; font-weight: 600; }
+  .capa .texto { position: absolute; left: 16mm; top: 52mm; width: 118mm; }
+  .capa h1 { color: #fff; font-size: 36pt; }
+  .capa h1 b { color: var(--cyan); }
+  .capa .sub { margin-top: 7mm; font-size: 10.4pt; color: rgba(255,255,255,.8); max-width: 44ch; line-height: 1.55; }
+  .capa .marinas { margin-top: 5mm; font-size: 8pt; color: rgba(255,255,255,.5); letter-spacing: .04em; max-width: 60ch; }
+  .capa .marinas b { color: rgba(255,255,255,.85); font-weight: 500; }
+  .capa .provas { position: absolute; left: 16mm; bottom: 24mm; width: 80mm; }
+  .capa .prova { border-left: 2px solid var(--cyan); padding-left: 4mm; margin-bottom: 5mm; }
+  .capa .prova .v { font-family: var(--display); font-weight: 600; font-size: 20pt; color: #fff; line-height: 1; }
+  .capa .prova .d { font-size: 8pt; color: rgba(255,255,255,.7); margin-top: 1.2mm; }
+  .capa .rodape { position: absolute; left: 16mm; right: 16mm; bottom: 10mm; display: flex; justify-content: space-between; font-size: 7.4pt; color: rgba(255,255,255,.45); letter-spacing: .06em; }
+
+  /* ---------- p.2: a conta ---------- */
+  .conta { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border-radius: 3mm; overflow: hidden; margin: 5mm 0; }
+  .conta > div { padding: 5.5mm 6mm; }
+  .conta .antes { background: var(--fog); }
+  .conta .depois { background: var(--navy); color: #fff; }
+  .conta .v { font-family: var(--display); font-weight: 600; font-size: 24pt; line-height: 1; }
+  .conta .antes .v { color: var(--navy); }
+  .conta .depois .v { color: var(--cyan); }
+  .conta .d { font-size: 8.6pt; margin-top: 2mm; }
+  .conta .depois .d { color: rgba(255,255,255,.8); }
+  .conta .depois { position: relative; }
+  .conta .depois::before { content: ""; position: absolute; left: -1px; top: 50%; width: 0; height: 0; border: 4mm solid transparent; border-left-color: var(--fog); transform: translateY(-50%); }
+  .provas-lista { display: grid; grid-template-columns: 1fr; gap: 4mm; }
+  .provas-lista .item { border-top: 1px solid var(--line); padding-top: 3mm; }
+  .provas-lista .v { font-family: var(--display); font-weight: 600; font-size: 19pt; line-height: 1; color: var(--navy); }
+  .provas-lista .v small { font-size: 10pt; font-weight: 400; color: var(--ink-2); letter-spacing: 0; }
+  .provas-lista .d { font-size: 8.4pt; color: var(--ink-2); margin-top: 1.6mm; }
+  .ganhos { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6mm; }
+  .ganhos .g { border-top: 2px solid var(--cyan); padding-top: 3mm; }
+  .ganhos p { font-size: 8.6pt; }
+
+  /* ---------- p.3: o que enxerga ---------- */
+  .cobertura { display: grid; grid-template-columns: 1.15fr 1fr 1fr; gap: 6mm; }
+  .cobertura .grupo { background: var(--fog); border-radius: 3mm; padding: 5mm 5.5mm; }
+  .cobertura .grupo.nmea { background: var(--navy); color: #fff; }
+  .cobertura .grupo.nmea h3 { color: #fff; }
+  .cobertura .grupo.nmea li { color: rgba(255,255,255,.88); }
+  .cobertura .grupo.nmea li::before { background: var(--cyan); }
+  .cobertura .grupo.nmea p { color: rgba(255,255,255,.75); font-size: 8pt; margin-top: 3mm; border-top: 1px solid var(--line-dark); padding-top: 3mm; }
+  .cobertura ul.dash li { font-size: 8.4pt; margin-bottom: 1.3mm; }
+  .hw { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4mm; }
+  .hw .item { text-align: center; }
+  .hw .foto { height: 30mm; display: flex; align-items: center; justify-content: center; margin-bottom: 2mm; }
+  .hw .foto img { max-height: 100%; max-width: 100%; width: auto; height: auto; }
+  .hw .n { font-family: var(--display); font-weight: 600; font-size: 8pt; color: var(--navy); line-height: 1.25; }
+  .hw .d { font-size: 7.4pt; color: var(--ink-2); line-height: 1.4; margin-top: 1mm; }
+  .instala { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4mm; background: var(--navy); color: #fff; border-radius: 3mm; padding: 5mm 6mm; }
+  .instala .k { font-family: var(--display); font-weight: 600; font-size: 13pt; color: var(--cyan); line-height: 1.1; }
+  .instala .d { font-size: 7.8pt; color: rgba(255,255,255,.78); margin-top: 1.2mm; line-height: 1.4; }
+
+  /* ---------- p.4: painel ---------- */
+  .painel { display: grid; grid-template-columns: 1.25fr 1fr; gap: 6mm; align-items: center; }
+  .painel img { width: 100%; height: auto; display: block; }
+  .fluxo { display: grid; grid-template-columns: 1fr 1fr 1fr 1.4fr; gap: 0; border: 1px solid var(--line); border-radius: 3mm; overflow: hidden; }
+  .fluxo .passo { padding: 4mm 4.5mm; position: relative; border-right: 1px solid var(--line); }
+  .fluxo .passo:last-child { border-right: 0; background: var(--fog); }
+  .fluxo .passo::after { content: ""; position: absolute; right: -1px; top: 50%; width: 0; height: 0; border: 2.6mm solid transparent; border-left-color: var(--line); transform: translateY(-50%); z-index: 1; }
+  .fluxo .passo:last-child::after { display: none; }
+  .fluxo .k { font-family: var(--display); font-weight: 600; font-size: 7.4pt; letter-spacing: .16em; text-transform: uppercase; color: var(--cyan-ink); }
+  .fluxo .n { font-family: var(--display); font-weight: 600; font-size: 10pt; color: var(--navy); margin: 1mm 0; }
+  .fluxo .d { font-size: 7.6pt; color: var(--ink-2); line-height: 1.4; }
+  .app { display: grid; grid-template-columns: 34mm 1fr 44mm; gap: 6mm; align-items: center; }
+  .app img { width: 100%; height: auto; display: block; }
+  .app .zap { border-radius: 3mm; overflow: hidden; }
+
+  /* ---------- p.5: manutenção e extras ---------- */
+  .manut { display: grid; grid-template-columns: 24mm 1fr 1fr 1fr; gap: 6mm; align-items: start; }
+  .manut img { width: 100%; height: auto; display: block; }
+  .manut .etapa { border-top: 2px solid var(--cyan); padding-top: 3mm; }
+  .manut .etapa .k { font-family: var(--display); font-weight: 600; font-size: 7.2pt; letter-spacing: .18em; color: var(--cyan-ink); text-transform: uppercase; }
+  .manut .etapa h3 { margin-top: 1mm; }
+  .manut .etapa p { font-size: 8pt; }
+  .momentos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4mm; background: var(--fog); border-radius: 3mm; padding: 3mm 5mm; }
+  .momentos .m b { display: block; font-family: var(--display); font-weight: 600; font-size: 8.6pt; color: var(--navy); }
+  .momentos .m { font-size: 7.6pt; color: var(--ink-2); line-height: 1.4; }
+  .extras { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5mm; }
+  .extra { border: 1px solid var(--line); border-radius: 3mm; padding: 4mm 4.5mm; display: flex; flex-direction: column; }
+  .extra.destaque { background: var(--navy); color: #fff; border-color: var(--navy); }
+  .extra.destaque h3 { color: #fff; }
+  .extra.destaque p, .extra.destaque li { color: rgba(255,255,255,.85); }
+  .extra.destaque .small { color: rgba(255,255,255,.55); }
+  .extra .st { font-family: var(--display); font-weight: 600; font-size: 7pt; letter-spacing: .18em; text-transform: uppercase; color: var(--cyan-ink); margin-bottom: 2mm; }
+  .extra.destaque .st { color: var(--cyan); }
+  .extra .foto { height: 24mm; display: flex; align-items: center; justify-content: center; margin: 1mm 0 3mm; }
+  .extra .foto img { max-height: 100%; max-width: 100%; width: auto; height: auto; }
+  .extra .foto.tall img { max-height: 24mm; border-radius: 2mm; }
+  .extra p { font-size: 7.9pt; }
+  .extra ul.dash li { font-size: 7.6pt; }
+  .extra .preco { margin-top: auto; padding-top: 3mm; border-top: 1px solid var(--line-dark); font-size: 8pt; }
+  .extra .preco .v { font-family: var(--display); font-weight: 600; font-size: 13pt; color: var(--cyan); line-height: 1.1; }
+  .extra .preco .vs { font-size: 7.6pt; color: rgba(255,255,255,.6); }
+  .extra .preco .vs b { color: #fff; font-weight: 500; }
+
+  /* ---------- p.6: modelo ---------- */
+  .termos { display: grid; grid-template-columns: 1fr 1fr; gap: 0 8mm; border-bottom: 1px solid var(--line); }
+  .termos .t { display: grid; grid-template-columns: 26mm 1fr; gap: 3mm; padding: 2.4mm 0; border-top: 1px solid var(--line); font-size: 8.1pt; line-height: 1.45; }
+  .termos .k { font-family: var(--display); font-weight: 600; font-size: 8pt; color: var(--navy); letter-spacing: .02em; }
+  .termos .v b { font-weight: 500; }
+  .caminhos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6mm; }
+  .caminhos .cm { border-top: 2px solid var(--cyan); padding: 3mm 0 0; }
+  .caminhos .cm h3 { margin-bottom: 1mm; }
+  .caminhos .cm p { font-size: 8pt; }
+  .sim { border-radius: 3mm; overflow: hidden; background: var(--navy); color: #fff; padding: 5mm 6mm; }
+  .sim h3 { color: #fff; }
+  .sim table { width: 100%; border-collapse: collapse; font-size: 8pt; margin-top: 2mm; }
+  .sim th { white-space: nowrap; text-align: right; font-family: var(--display); font-weight: 600; font-size: 7.2pt; letter-spacing: .12em; text-transform: uppercase; color: var(--cyan); padding: 0 0 2mm; border-bottom: 1px solid var(--line-dark); }
+  .sim th:first-child { text-align: left; }
+  .sim td { white-space: nowrap; padding: 1.8mm 0 1.8mm 3mm; border-bottom: 1px solid var(--line-dark); text-align: right; font-variant-numeric: tabular-nums; color: rgba(255,255,255,.88); }
+  .sim td:first-child { text-align: left; color: rgba(255,255,255,.75); white-space: normal; padding-left: 0; }
+  .sim tr.total td { font-weight: 600; color: #fff; border-bottom: 0; padding-top: 2.6mm; }
+  .sim tr.total td:first-child { color: #fff; }
+  .sim .small { color: rgba(255,255,255,.5); margin-top: 3mm; }
+  .mercado { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5mm; }
+  .mercado .m .v { font-family: var(--display); font-weight: 600; font-size: 16pt; color: var(--navy); line-height: 1; }
+  .mercado .m .d { font-size: 7.5pt; color: var(--ink-2); margin-top: 1.4mm; line-height: 1.4; }
+
+  /* ---------- p.7: implantação ---------- */
+  .etapas { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5mm; position: relative; }
+  .etapas::before { content: ""; position: absolute; left: 0; right: 0; top: 4.6mm; height: 1px; background: var(--line); }
+  .etapa2 { position: relative; padding-top: 9mm; }
+  .etapa2 .n { position: absolute; top: 0; left: 0; width: 9.2mm; height: 9.2mm; border-radius: 50%; background: var(--navy); color: var(--cyan); font-family: var(--display); font-weight: 600; font-size: 9pt; display: flex; align-items: center; justify-content: center; padding-top: .6mm; }
+  .etapa2 .k { font-family: var(--display); font-weight: 600; font-size: 7.2pt; letter-spacing: .16em; text-transform: uppercase; color: var(--cyan-ink); }
+  .etapa2 h3 { margin: 1mm 0 2mm; }
+  .etapa2 p { font-size: 8.3pt; }
+  .faq { display: grid; grid-template-columns: 1fr 1fr; gap: 4mm 8mm; }
+  .faq .q { border-top: 1px solid var(--line); padding-top: 2.6mm; }
+  .faq .q b { display: block; font-family: var(--display); font-weight: 600; font-size: 8.8pt; color: var(--navy); margin-bottom: 1.2mm; }
+  .faq .q p { font-size: 8.2pt; }
+
+  /* ---------- p.8: contracapa ---------- */
+  .fim { padding: 18mm 18mm 16mm; }
+  .fim .cta { margin-top: 20mm; max-width: 130mm; }
+  .fim h1 { font-size: 30pt; }
+  .fim h1 b { color: var(--cyan); }
+  .fim .contatos { display: grid; grid-template-columns: 1fr 1fr; gap: 6mm 10mm; margin-top: 16mm; max-width: 150mm; }
+  .fim .ct { border-top: 1px solid var(--line-dark); padding-top: 3mm; }
+  .fim .ct .k { font-family: var(--display); font-weight: 600; font-size: 7.2pt; letter-spacing: .2em; text-transform: uppercase; color: rgba(255,255,255,.55); }
+  .fim .ct .v { font-family: var(--display); font-weight: 600; font-size: 15pt; color: #fff; margin-top: 1mm; line-height: 1.2; }
+  .fim .ct .v.sm { font-size: 11pt; font-weight: 400; }
+  .fim .lojas { display: flex; gap: 3mm; margin-top: 12mm; }
+  .fim .loja { border: 1px solid var(--line-dark); border-radius: 2.5mm; padding: 2.4mm 4mm; font-size: 7.6pt; color: rgba(255,255,255,.8); line-height: 1.25; }
+  .fim .loja b { display: block; font-weight: 500; font-size: 9pt; color: #fff; }
+  .fim .juridico { position: absolute; left: 18mm; right: 18mm; bottom: 14mm; font-size: 7.2pt; color: rgba(255,255,255,.45); line-height: 1.5; max-width: 150mm; }
+  .fim .logo-fim { position: absolute; right: 18mm; top: 18mm; height: 9mm; width: auto; }
+
+  /* ---------- impressão ---------- */
+  @page { size: A4; margin: 0; }
+  @media print {
+    html, body { background: #fff; padding: 0; margin: 0; }
+    .toolbar { display: none; }
+    .page { margin: 0; box-shadow: none; break-after: page; page-break-after: always; zoom: 1; }
+    .page:last-child { break-after: auto; page-break-after: auto; }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+  @media (prefers-reduced-motion: no-preference) { .toolbar button { transition: background .15s; } }
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <div><b>SAFEBOAT × BR Marinas</b> · folder de apresentação · 8 páginas A4</div>
+  <button type="button" id="btnPdf" onclick="window.print()">Salvar em PDF</button>
+</div>
+
+<!-- ======================= 1 · CAPA ======================= -->
+<section class="page dark capa">
+  <div class="art"><img src="img/hero-banner.webp" alt="Lancha vista de cima com a central SAFEBOAT conectada aos sensores de bordo"></div>
+  <div class="top">
+    <img src="img/logo-branco.webp" alt="SAFEBOAT">
+    <div class="para">Apresentação para <b>BR Marinas</b></div>
+  </div>
+  <div class="texto">
+    <div class="eyebrow">Monitoramento preditivo · Gestão de frotas</div>
+    <h1>Cada barco da rede, vigiado 24 horas.<br><b>Antes da falha. Não depois.</b></h1>
+    <p class="sub">O SAFEBOAT conecta bateria, porão, casa de máquinas e motores de cada embarcação a um painel único para a marina e a um aplicativo para o proprietário. A falha aparece como alerta, enquanto ainda é manutenção.</p>
+    <p class="marinas">Pensado para operar em rede — <b>da Marina da Glória a Paraty</b>, com o mesmo padrão em todas as unidades.</p>
+  </div>
+  <div class="provas">
+    <div class="prova"><div class="v">3</div><div class="d">naufrágios evitados por alerta antecipado</div></div>
+    <div class="prova"><div class="v">+R$ 10 mi</div><div class="d">em prejuízos evitados a proprietários</div></div>
+    <div class="prova"><div class="v">+100</div><div class="d">embarcações monitoradas desde outubro de 2024, sem um naufrágio ou incêndio</div></div>
+  </div>
+  <div class="rodape"><span>safeboat.tech</span><span>Florianópolis · SC · Setembro de 2026</span></div>
+</section>
+
+<!-- ======================= 2 · A CONTA ======================= -->
+<section class="page">
+  <div class="hd"><img src="img/logo-navy.webp" alt="SAFEBOAT"><div class="tag">O problema · <b>02</b></div></div>
+  <div class="eyebrow">Por que uma marina precisa disso</div>
+  <h2>Barco parado é prejuízo. <b>E ele para no berço, não no mar.</b></h2>
+  <div class="cols c2" style="gap:10mm">
+    <div>
+      <p class="lead">Uma embarcação de marina passa a maior parte do ano atracada. É ali que a bateria descarrega, que a bomba de porão começa a disparar mais do que deveria, que a água aparece onde não devia e que a casa de máquinas esquenta.</p>
+      <p>Ninguém está a bordo para ver. O proprietário descobre na sexta-feira, com a família no píer e o fim de semana comprometido. E a marina descobre junto com ele — no pior momento, com a pior informação.</p>
+      <p>E raramente a causa é proporcional ao estrago:</p>
+      <div class="conta">
+        <div class="antes"><div class="v">R$ 1,5 mil</div><div class="d">a bateria que falhou</div></div>
+        <div class="depois"><div class="v">R$ 30 mil</div><div class="d">o fim de semana que ela levou</div></div>
+      </div>
+      <p class="small">Duas diárias de charter a R$ 15 mil que não são faturadas, enquanto os R$ 20 mil mensais de marina, marinheiro e manutenção correm igual. Valores de referência de mercado para uma embarcação de 50 pés; variam por região, modelo e operação.</p>
+    </div>
+    <div>
+      <h4>O que o SAFEBOAT já evitou</h4>
+      <div class="provas-lista">
+        <div class="item"><div class="v">3</div><div class="d">naufrágios evitados por alerta antecipado de bomba de porão e alagamento</div></div>
+        <div class="item"><div class="v">+R$ 10 <small>milhões</small></div><div class="d">em prejuízos evitados a proprietários, estimados a partir dos casos registrados</div></div>
+        <div class="item"><div class="v">Milhares</div><div class="d">de falhas identificadas antes da parada — bateria, porão, temperatura, comunicação</div></div>
+        <div class="item"><div class="v">Zero</div><div class="d">naufrágios ou incêndios na base monitorada desde outubro de 2024</div></div>
+      </div>
+      <p class="small" style="margin-top:4mm">Base própria de mais de 100 embarcações monitoradas pela SAFEBOAT, em Santa Catarina e em outros estados, desde outubro de 2024.</p>
+    </div>
+  </div>
+  <div class="grow"></div>
+  <h4>O que isso muda para a BR Marinas</h4>
+  <div class="ganhos">
+    <div class="g"><h3>Menos emergência, mais rotina</h3><p>A equipe de marinharia passa a agir por alerta, no momento certo, e não por ronda ou por reclamação. Bateria em queda vira uma tarefa de terça-feira, não uma urgência de sábado.</p></div>
+    <div class="g"><h3>A marina avisa antes de o cliente perceber</h3><p>A ligação muda de sentido: em vez de ouvir “meu barco não pegou”, a marina liga dizendo “identificamos e já resolvemos”. É o tipo de serviço que justifica o berço premium.</p></div>
+    <div class="g"><h3>Histórico e prova</h3><p>Cada embarcação com registro contínuo de sensores e manutenções — para o proprietário, para o seguro, para a gestão da própria marina e para a prestação de contas em cotas e condomínios.</p></div>
+  </div>
+  <div class="ft"><span>SAFEBOAT · Sistema de monitoramento e manutenção inteligente para embarcações</span><span class="folio">02</span></div>
+</section>
+
+<!-- ======================= 3 · O QUE ENXERGA ======================= -->
+<section class="page">
+  <div class="hd"><img src="img/logo-navy.webp" alt="SAFEBOAT"><div class="tag">O sistema · <b>03</b></div></div>
+  <div class="eyebrow">Cobertura completa</div>
+  <h2>Tudo o que acontece a bordo, <b>medido 24 horas por dia.</b></h2>
+  <p class="lead" style="margin-bottom:6mm">A central SAFEBOAT conecta os sensores da embarcação e envia cada leitura para a nuvem — com histórico, alertas e a mesma informação no painel da marina e no aplicativo do proprietário.</p>
+  <div class="cobertura">
+    <div class="grupo">
+      <h3>Embarcação</h3>
+      <ul class="dash">
+        <li>Rastreio e velocidade</li>
+        <li>Cerca virtual com alarme de âncora</li>
+        <li>Acionamentos da bomba de porão e tempo ligada</li>
+        <li>Alarme de alagamento</li>
+        <li>Detector de fumaça com sirene a bordo</li>
+        <li>Tensão de todos os bancos de bateria</li>
+        <li>Posição da chave geral</li>
+        <li>Temperatura da casa de máquinas</li>
+        <li>Umidade na casa de máquinas</li>
+      </ul>
+    </div>
+    <div class="grupo">
+      <h3>Motores</h3>
+      <ul class="dash">
+        <li>Horímetro</li>
+        <li>Rotação</li>
+        <li>Pressão de óleo</li>
+        <li>Temperatura de óleo</li>
+        <li>Temperatura de coolant</li>
+        <li>Pressão de combustível</li>
+        <li>Pressão de turbina</li>
+        <li>Consumo instantâneo e por trajeto</li>
+      </ul>
+    </div>
+    <div class="grupo nmea">
+      <h3>Com rede NMEA · CAN</h3>
+      <ul class="dash">
+        <li>Profundidade</li>
+        <li>Níveis dos tanques de combustível e água</li>
+        <li>Toda a instrumentação já existente a bordo — NMEA 2000 e J1939</li>
+      </ul>
+      <p>A embarcação não tem rede NMEA? Nós criamos uma e convertemos os dados dos motores (J1939) — lendo tudo o que estiver a bordo.</p>
+    </div>
+  </div>
+  <div class="rule"></div>
+  <h4>Componentes do sistema — desenvolvidos para o ambiente náutico</h4>
+  <div class="hw">
+    <div class="item"><div class="foto"><img src="img/hw-central.webp" alt="SAFEBOAT Central"></div><div class="n">SAFEBOAT Central</div><div class="d">O cérebro a bordo: conecta os sensores e transmite para a nuvem pela rede celular.</div></div>
+    <div class="item"><div class="foto"><img src="img/hw-sensor-bateria.webp" alt="Sensor de consumo de bateria"></div><div class="n">Sensor de bateria</div><div class="d">Tensão e corrente medidas diretamente no banco.</div></div>
+    <div class="item"><div class="foto"><img src="img/hw-detector-fumaca.webp" alt="Detector de fumaça"></div><div class="n">Detector de fumaça</div><div class="d">Detecção precoce de incêndio com alerta imediato e sirene.</div></div>
+    <div class="item"><div class="foto"><img src="img/hw-leitor-nmea.webp" alt="Leitor NMEA WiFi"></div><div class="n">Leitor NMEA</div><div class="d">Lê a rede NMEA 2000 da embarcação e integra ao sistema.</div></div>
+    <div class="item"><div class="foto"><img src="img/hw-leitor-j1939.webp" alt="Leitor J1939 WiFi"></div><div class="n">Leitor J1939</div><div class="d">Telemetria dos motores: RPM, temperaturas, pressões e consumo.</div></div>
+    <div class="item"><div class="foto"><img src="img/hw-conversor.webp" alt="Conversor J1939 para NMEA"></div><div class="n">Conversor J1939 – NMEA</div><div class="d">Leva os dados dos motores para a rede NMEA do barco.</div></div>
+  </div>
+  <div class="grow"></div>
+  <div class="instala">
+    <div><div class="k">~4 horas</div><div class="d">de instalação por embarcação, pela equipe técnica SAFEBOAT</div></div>
+    <div><div class="k">Sem obra</div><div class="d">sem furar o casco e sem interferir na estética do barco</div></div>
+    <div><div class="k">Comodato</div><div class="d">o hardware é da SAFEBOAT; se falhar, a reposição é por nossa conta</div></div>
+    <div><div class="k">Rede própria</div><div class="d">a central usa conexão celular — não depende do Wi-Fi da marina nem do barco</div></div>
+  </div>
+  <div class="ft"><span>Sensores de fumaça e alagamento, central, sirene e leitores compõem o kit conforme a rede de bordo de cada embarcação</span><span class="folio">03</span></div>
+</section>
+
+<!-- ======================= 4 · PAINEL E APP ======================= -->
+<section class="page">
+  <div class="hd"><img src="img/logo-navy.webp" alt="SAFEBOAT"><div class="tag">Painel de frota · <b>04</b></div></div>
+  <div class="eyebrow">Para marinas e gestores</div>
+  <h2>Um painel para a rede inteira. <b>Um aplicativo para cada proprietário.</b></h2>
+  <div class="painel">
+    <div><img src="img/dash-laptop.webp" alt="Dashboard SAFEBOAT no notebook com embarcações cadastradas, alertas e banco de baterias"></div>
+    <div>
+      <h4>O que a operação da marina vê</h4>
+      <ul class="check">
+        <li><strong>Alertas e avisos por embarcação</strong>, com o que já foi resolvido e o que segue aberto</li>
+        <li><strong>Bancos de bateria</strong> com a tensão de cada barco, em tempo real e em histórico</li>
+        <li><strong>Bombas de porão</strong>: quem disparou, quantas vezes e por quanto tempo</li>
+        <li><strong>Revisões vencidas</strong> em qual barco, com horímetro lido direto dos motores</li>
+        <li><strong>Grupos e usuários por marina</strong> — cada unidade enxerga a sua frota; a diretoria enxerga a rede</li>
+        <li><strong>Mapa das embarcações</strong> e relatórios exportáveis por período e por frota</li>
+      </ul>
+    </div>
+  </div>
+  <div class="rule" style="margin:5mm 0"></div>
+  <h4>Como um alerta chega</h4>
+  <div class="fluxo">
+    <div class="passo"><div class="k">A bordo</div><div class="n">Sensor detecta</div><div class="d">Bomba de porão disparando demais, tensão em queda, fumaça, água, calor.</div></div>
+    <div class="passo"><div class="k">Central</div><div class="n">Central transmite</div><div class="d">Pela rede celular própria, com sirene local em alagamento, alta temperatura ou fumaça.</div></div>
+    <div class="passo"><div class="k">Nuvem</div><div class="n">Plataforma analisa</div><div class="d">Compara com o histórico da embarcação e classifica: aviso ou alerta.</div></div>
+    <div class="passo"><div class="k">Ao mesmo tempo</div><div class="n">Marina e proprietário são avisados</div><div class="d">Painel da marina, notificação no app e, se quiser, a SAFEBOAT AI no WhatsApp. A marinharia age antes de o cliente ligar.</div></div>
+  </div>
+  <div class="grow"></div>
+  <div class="app">
+    <div><img src="img/app-sensores.webp" alt="Tela do aplicativo SAFEBOAT com sensores críticos: ambiente interno, bombas de porão, alarme de incêndio e sensor de alagamento"></div>
+    <div>
+      <h3>O cliente da marina vê o barco no bolso</h3>
+      <p>Aberto o app, ele vê em segundos o que importa: sensores críticos, posição, navegação com cartas náuticas oficiais, alarme de âncora e a saúde de cada sistema de bordo — com botão SOS sempre à mão.</p>
+      <p style="margin-top:3mm"><strong>E conversa com o barco.</strong> “Opa, como está meu barco hoje?” — pergunta no WhatsApp e a SAFEBOAT AI consulta os sensores, o histórico e as manutenções para responder na hora, em linguagem simples.</p>
+      <p class="small" style="margin-top:3mm">Disponível na App Store e no Google Play · Suporte em português</p>
+    </div>
+    <div class="zap"><img src="img/app-ia-whatsapp.webp" alt="Mão segurando celular com conversa no WhatsApp: a SAFEBOAT AI responde como está o barco"></div>
+  </div>
+  <div class="ft"><span>Telas reais do painel de frota e do aplicativo SAFEBOAT</span><span class="folio">04</span></div>
+</section>
+
+<!-- ======================= 5 · MANUTENÇÃO E EXTRAS ======================= -->
+<section class="page">
+  <div class="hd"><img src="img/logo-navy.webp" alt="SAFEBOAT"><div class="tag">Manutenção e extras · <b>05</b></div></div>
+  <div class="eyebrow">Gestão de manutenções</div>
+  <h2>Cada serviço registrado. <b>Cada revisão no prazo.</b></h2>
+  <div class="manut">
+    <div><img src="img/app-revisoes.webp" alt="Tela de revisões do aplicativo SAFEBOAT com grupos de manutenção de motor, elétrica e gerador"></div>
+    <div class="etapa"><div class="k">Registra</div><h3>O histórico sai da cabeça do marinheiro</h3><p>Óleo, filtros, hélice, salvatagem, elétrica, gerador: cada serviço fica no app com data, horímetro e responsável — visível para a marina e para o proprietário.</p></div>
+    <div class="etapa"><div class="k">Avisa</div><h3>Vence por tempo ou por hora de motor</h3><p>O horímetro vem direto dos motores, sem ninguém anotar. O app avisa antes de vencer e o painel mostra o que está atrasado em qual barco da marina.</p></div>
+    <div class="etapa"><div class="k">Alimenta a IA</div><h3>Cada registro melhora o diagnóstico</h3><p>A SAFEBOAT AI cruza o que os sensores medem agora com o que já foi feito a bordo — e responde sabendo quando a bateria foi trocada e o que segue pendente.</p></div>
+  </div>
+  <div class="momentos" style="margin-top:4mm">
+    <div class="m"><b>Na revenda</b>embarcação com manutenção comprovada negocia melhor</div>
+    <div class="m"><b>No seguro</b>evidência objetiva de que o barco é cuidado</div>
+    <div class="m"><b>Na prestação de contas</b>cotistas e sócios veem o que foi feito, quando e por quem</div>
+  </div>
+  <div class="rule" style="margin:4.5mm 0 4mm"></div>
+  <div class="eyebrow">Além dos sensores</div>
+  <div class="extras">
+    <div class="extra">
+      <div class="st">Disponível</div>
+      <h3>Câmeras com visão noturna</h3>
+      <div class="foto tall"><img src="img/app-cameras.webp" alt="Tela real do aplicativo SAFEBOAT com duas câmeras ao vivo e alarme de âncora ativo"></div>
+      <ul class="dash">
+        <li>Infravermelho: enxerga na escuridão total</li>
+        <li>Ao vivo pelo aplicativo, de onde estiver</li>
+        <li>Casa de máquinas, popa, cockpit ou cabine</li>
+        <li>Requer internet a bordo (ex.: Starlink)</li>
+      </ul>
+    </div>
+    <div class="extra destaque">
+      <div class="st">Manutenção preditiva · Pioneirismo mundial</div>
+      <h3>VIB — o ouvido do motor</h3>
+      <div class="foto"><img src="img/render-vib.webp" alt="Sensor SAFEBOAT VIB"></div>
+      <p>Sensor autônomo do tamanho de uma castanha, fixado na caixa reversora. Aprende a assinatura de vibração do motor, cancela o balanço do mar e avisa semanas antes de desalinhamento, folga de hélice ou mancal virarem retífica.</p>
+      <ul class="dash" style="margin-top:2mm">
+        <li>Zero falso alarme em 280 testes de bancada e mar (Volvo Penta e MAN)</li>
+        <li>Cruza vibração com os dados CAN do motor — inédito embarcado</li>
+      </ul>
+      <div class="preco"><div class="v">R$ 49,90 <span style="font-size:8pt;font-weight:400">/mês por motor</span></div><div class="vs">contra <b>R$ 45–80 mil</b> da retífica de um diesel marítimo</div></div>
+    </div>
+    <div class="extra">
+      <div class="st">Em desenvolvimento</div>
+      <h3>Câmera térmica com IA</h3>
+      <div class="foto"><img src="img/render-termica.webp" alt="Câmera térmica SAFEBOAT em suporte articulado"></div>
+      <p>Visão térmica contínua da casa de máquinas com análise por inteligência artificial: pontos quentes e superaquecimentos detectados antes de virarem incêndio.</p>
+      <p class="small" style="margin-top:3mm">Próximo lançamento do laboratório SAFEBOAT.</p>
+    </div>
+  </div>
+  <div class="ft"><span>Câmeras e VIB são opcionais por embarcação; o kit base já monitora segurança, baterias e casa de máquinas</span><span class="folio">05</span></div>
+</section>
+
+<!-- ======================= 6 · MODELO ======================= -->
+<section class="page">
+  <div class="hd"><img src="img/logo-navy.webp" alt="SAFEBOAT"><div class="tag">Modelo comercial · <b>06</b></div></div>
+  <div class="eyebrow">Parceria B2B</div>
+  <h2>Um modelo feito para <b>operar em rede.</b></h2>
+  <h4>Como funciona a parceria</h4>
+  <div class="termos">
+    <div class="t"><div class="k">Contrato único</div><div class="v">Um contrato de frota entre SAFEBOAT e BR Marinas, cobrindo todas as unidades. A marina revende ou inclui o serviço aos seus clientes, com preço e condições que ela mesma define.</div></div>
+    <div class="t"><div class="k">Hardware</div><div class="v">Em comodato, sem compra de equipamento. Se um componente falhar, a SAFEBOAT repõe.</div></div>
+    <div class="t"><div class="k">Assinatura</div><div class="v"><b>R$ 189 por embarcação ativa, por mês</b> (ou o equivalente anual), apurada pelos barcos ativos no mês anterior. Referência de varejo ao proprietário: R$ 249/mês.</div></div>
+    <div class="t"><div class="k">Entra e sai</div><div class="v">Embarcações são adicionadas ou excluídas por solicitação, acompanhando a ocupação da marina.</div></div>
+    <div class="t"><div class="k">Implantação</div><div class="v">Valor único por embarcação, definido pela rede de bordo (sem rede, NMEA ou CAN com conversor). Fechado na proposta após o diagnóstico da frota.</div></div>
+    <div class="t"><div class="k">Suporte</div><div class="v">Técnico remoto em horário comercial; reajuste anual pelo IPCA; software e aplicativo atualizados sem custo.</div></div>
+  </div>
+  <h4 style="margin-top:6mm">Três formas de levar ao cliente</h4>
+  <div class="caminhos">
+    <div class="cm"><h3>Benefício do berço</h3><p>Incluso na mensalidade das vagas premium ou de determinadas categorias. Diferenciação que o concorrente não tem e um motivo concreto para o cliente ficar.</p></div>
+    <div class="cm"><h3>Serviço revendido</h3><p>A marina oferece o SAFEBOAT como serviço próprio, com sua marca de atendimento, e fica com a diferença entre o repasse e o preço praticado.</p></div>
+    <div class="cm"><h3>Produto com seguradora</h3><p>Histórico contínuo por embarcação para subscrição e precificação. A SAFEBOAT está selecionando uma seguradora parceira para um produto náutico embarcado — a rede BR Marinas seria a base ideal.</p></div>
+  </div>
+  <div class="grow"></div>
+  <div class="cols c2" style="gap:8mm; align-items:stretch">
+    <div class="sim">
+      <h3>Exemplo ilustrativo · serviço revendido</h3>
+      <table>
+        <thead><tr><th>Por mês · barcos ativos</th><th>100</th><th>300</th><th>500</th></tr></thead>
+        <tbody>
+          <tr><td>Repasse à SAFEBOAT (R$ 189)</td><td>R$ 18.900</td><td>R$ 56.700</td><td>R$ 94.500</td></tr>
+          <tr><td>Receita a R$ 249 (referência)</td><td>R$ 24.900</td><td>R$ 74.700</td><td>R$ 124.500</td></tr>
+          <tr class="total"><td>Fica na marina, por ano</td><td>R$ 72.000</td><td>R$ 216.000</td><td>R$ 360.000</td></tr>
+        </tbody>
+      </table>
+      <p class="small">Sem contar o que não aparece na tabela: chamados de emergência que deixam de existir, sinistros evitados e retenção de clientes. Implantação por embarcação não incluída.</p>
+    </div>
+    <div>
+      <h4>O mercado, em números oficiais</h4>
+      <div class="mercado" style="grid-template-columns:1fr 1fr">
+        <div class="m"><div class="v">118.098</div><div class="d">embarcações registradas na Marinha no estado do Rio de Janeiro</div></div>
+        <div class="m"><div class="v">1.140.059</div><div class="d">embarcações registradas no Brasil, de canoa a plataforma</div></div>
+        <div class="m"><div class="v">289.707</div><div class="d">lanchas, veleiros, multicascos e jet boats — o recorte com sistemas a monitorar</div></div>
+        <div class="m"><div class="v">+21,5%</div><div class="d">de crescimento no registro de lanchas desde 2019; multicascos, +150%</div></div>
+      </div>
+      <p class="small" style="margin-top:4mm">Fonte: Marinha do Brasil / Diretoria de Portos e Costas, conjunto “Embarcações” (dados.gov.br), arquivo mais recente, licença ODbL. Estoque acumulado de inscrições; recorte por tipo de casco é classificação da SAFEBOAT.</p>
+    </div>
+  </div>
+  <div class="ft"><span>Valores de repasse conforme contrato de prestação de serviços para empresas (B2B) da SAFEBOAT · sujeitos a proposta formal</span><span class="folio">06</span></div>
+</section>
+
+<!-- ======================= 7 · IMPLANTAÇÃO ======================= -->
+<section class="page">
+  <div class="hd"><img src="img/logo-navy.webp" alt="SAFEBOAT"><div class="tag">Implantação · <b>07</b></div></div>
+  <div class="eyebrow">Como implantamos na rede</div>
+  <h2>Da primeira marina <b>à rede inteira.</b></h2>
+  <div class="etapas">
+    <div class="etapa2"><div class="n">1</div><div class="k">Semanas 1–2</div><h3>Diagnóstico da frota</h3><p>Levantamento por marina: embarcações, motorização e rede de bordo de cada uma. Define o kit por barco e fecha a proposta com valores de implantação.</p></div>
+    <div class="etapa2"><div class="n">2</div><div class="k">30 dias</div><h3>Piloto em uma unidade</h3><p>Primeiras embarcações instaladas, painel ativo para a equipe da marina e medição do que muda: alertas, chamados, tempo de resposta.</p></div>
+    <div class="etapa2"><div class="n">3</div><div class="k">Marina a marina</div><h3>Expansão</h3><p>Agenda de instalação por unidade, cerca de 4 horas por barco, sem obra. Onboarding da equipe no painel e dos proprietários no aplicativo.</p></div>
+    <div class="etapa2"><div class="n">4</div><div class="k">Contínuo</div><h3>Operação</h3><p>Suporte técnico, reposição de equipamento, relatórios por marina e por período. Barcos entram e saem do contrato conforme a ocupação.</p></div>
+  </div>
+  <div class="rule" style="margin:7mm 0 5mm"></div>
+  <h4>Perguntas que toda marina faz</h4>
+  <div class="faq">
+    <div class="q"><b>Precisa de internet na marina ou no barco?</b><p>Não. A central tem conexão celular própria. Só as câmeras exigem internet a bordo (Starlink ou equivalente); sem ela, todo o restante funciona normalmente.</p></div>
+    <div class="q"><b>E os barcos sem rede NMEA ou com motor mecânico?</b><p>O kit base monitora segurança, baterias, porão e casa de máquinas em qualquer embarcação. Motor eletrônico sem tela recebe o conversor; motor mecânico pode receber o VIB para a saúde do motor.</p></div>
+    <div class="q"><b>A instalação atrapalha a operação da marina?</b><p>Cerca de 4 horas por barco, no berço, sem furar o casco e sem obra. A agenda é combinada com cada unidade para não coincidir com saídas.</p></div>
+    <div class="q"><b>De quem é o equipamento?</b><p>Da SAFEBOAT, em comodato. A marina não compra hardware; se um componente falhar, a reposição é por nossa conta.</p></div>
+    <div class="q"><b>Quem atende o proprietário?</b><p>A relação contratual da SAFEBOAT é com a marina, que define preço e atendimento ao cliente final. Suporte direto ao proprietário pode ser contratado à parte.</p></div>
+    <div class="q"><b>Substitui seguro ou vigilância?</b><p>Não. O SAFEBOAT é ferramenta de monitoramento remoto e apoio à manutenção. Ele reduz o risco e documenta o cuidado — o seguro, as inspeções e a manutenção preventiva continuam obrigatórios.</p></div>
+  </div>
+  <div class="grow"></div>
+  <div class="band navy">
+    <div class="cols c2" style="gap:8mm; align-items:center">
+      <div><h3>Sugestão de piloto</h3><p>Começar pela unidade com maior concentração de lanchas de motor eletrônico: é onde a telemetria de motores e o painel mostram resultado mais rápido, e onde a equipe sente a diferença já no primeiro mês.</p></div>
+      <div><p class="small">A SAFEBOAT leva à reunião o cálculo por embarcação, a demonstração do painel de frota com uma frota real e o plano de instalação por unidade.</p></div>
+    </div>
+  </div>
+  <div class="ft"><span>Instalação em até 30 dias após a confirmação; o período da assinatura só começa a contar após a instalação</span><span class="folio">07</span></div>
+</section>
+
+<!-- ======================= 8 · CONTRACAPA ======================= -->
+<section class="page dark fim">
+  <img class="logo-fim" src="img/logo-branco.webp" alt="SAFEBOAT">
+  <div class="eyebrow">Próximo passo</div>
+  <div class="cta">
+    <h1>Uma marina. Trinta dias. <b>Os números da sua operação.</b></h1>
+    <p class="lead" style="margin-top:7mm; max-width:60ch">Vamos escolher juntos a unidade do piloto, levantar a frota e voltar com a proposta fechada por embarcação. O painel da rede pode estar no ar antes da próxima temporada.</p>
+  </div>
+  <div class="contatos">
+    <div class="ct"><div class="k">WhatsApp</div><div class="v">48 99140-0063</div></div>
+    <div class="ct"><div class="k">Site</div><div class="v">safeboat.tech</div></div>
+    <div class="ct"><div class="k">Instagram</div><div class="v sm">@safeboat.tech</div></div>
+    <div class="ct"><div class="k">Sede</div><div class="v sm">Florianópolis · Santa Catarina</div></div>
+  </div>
+  <div class="lojas">
+    <div class="loja">Disponível na<b>App Store</b></div>
+    <div class="loja">Disponível no<b>Google Play</b></div>
+    <div class="loja">Compatível com<b>NMEA 2000 · J1939</b></div>
+  </div>
+  <div class="juridico">
+    SAFEBOAT TECNOLOGIA LTDA · CNPJ 52.998.441/0001-28 · Rua Silva Jardim, 838, Sala 04, Centro, Florianópolis/SC, CEP 88020-200.<br>
+    Naufrágios e prejuízos evitados: casos registrados na base própria de embarcações monitoradas desde outubro de 2024. Valores de indisponibilidade e do exemplo de revenda são ilustrativos. O SAFEBOAT é ferramenta auxiliar de monitoramento remoto e não substitui seguro, inspeções ou manutenção preventiva. Dados de mercado: Marinha do Brasil / DPC, conjunto “Embarcações”, licença ODbL.<br>
+    Feito à beira-mar, em Santa Catarina · Brasil · © 2026 SAFEBOAT
+  </div>
+</section>
+
+<script>
+  // Ajusta a escala das páginas A4 à largura da tela (visualização; a impressão sai em 1:1).
+  (function () {
+    var root = document.documentElement;
+    function fit() {
+      var pageW = 210 * 96 / 25.4; // 210mm em px CSS
+      var avail = Math.max(280, window.innerWidth - 32);
+      root.style.setProperty('--z', Math.min(1, avail / pageW).toFixed(4));
+    }
+    fit();
+    window.addEventListener('resize', fit);
+    window.addEventListener('beforeprint', function () { root.style.setProperty('--z', 1); });
+    window.addEventListener('afterprint', fit);
+  })();
+</script>
+</body>
+</html>
