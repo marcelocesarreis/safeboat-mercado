@@ -18,7 +18,7 @@ Publicado em https://marcelocesarreis.github.io/safeboat-mercado
 | `dados/embarcacoes-por-atividade.csv` | 69 tipos agrupados em 11 categorias de atividade |
 | `dados/embarcacoes-por-porte-inferido.csv` | Faixas de porte deduzidas do tipo — aproximação |
 | `dados/README.md` | Proveniência, ressalvas de leitura e como reproduzir a extração |
-| `folder-br-marinas/` | Folder de apresentação do SAFEBOAT para a BR Marinas — `index.html` (8 páginas A4, botão "Salvar em PDF") e `safeboat-br-marinas.pdf` já gerado. Imagens e textos vêm do site safeboat.tech |
+| `folder-marinas/` | Folder de apresentação do SAFEBOAT para marinas e redes de marinas — `index.html` (8 páginas A4, botão "Salvar em PDF") e `safeboat-marinas.pdf` já gerado. Imagens e textos vêm do site safeboat.tech |
 
 ## Número principal
 
